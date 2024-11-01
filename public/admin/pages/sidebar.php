@@ -93,7 +93,7 @@
         </a>
     </li>
     <li class="menu-item active">
-        <a href="lessons_manager.php" class="menu-link">
+        <a href="lessons_manage.php" class="menu-link">
         <i class="menu-icon tf-icons ri-table-alt-line"></i>
         <div data-i18n="Tables">Bài học</div>
         </a>
