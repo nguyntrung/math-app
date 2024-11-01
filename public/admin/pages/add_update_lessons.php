@@ -8,7 +8,7 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 }
 
 // Kết nối cơ sở dữ liệu
-include 'C:\xampp\htdocs\math-app\database\db.php';
+include '../../../database/db.php';
 
 // Khởi tạo biến cho các trường
 $maBaiHoc = '';

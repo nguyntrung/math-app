@@ -5,9 +5,8 @@ if (!isset($_SESSION['MaNguoiDung'])) {
     header('Location: login.php');
     exit();
 }
-
 // Kết nối cơ sở dữ liệu
-include 'C:\xampp\htdocs\math-app\database\db.php';
+include '../../../database/db.php';
 
 ?>
 

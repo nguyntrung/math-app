@@ -53,7 +53,7 @@
                     </div>
                     </div>
                     <div class="flex-grow-1">
-                    <h6 class="mb-0 small">John Doe</h6>
+                    <h6 class="mb-0 small"><?php echo $_SESSION['HoTen']; ?></h6>
                     <small class="text-muted">Admin</small>
                     </div>
                 </div>
@@ -91,7 +91,7 @@
             </li>
             <li>
                 <div class="d-grid px-4 pt-2 pb-1">
-                <a class="btn btn-danger d-flex" href="javascript:void(0);">
+                <a class="btn btn-danger d-flex" href="../../logout.php">
                     <small class="align-middle">Logout</small>
                     <i class="ri-logout-box-r-line ms-2 ri-16px"></i>
                 </a>

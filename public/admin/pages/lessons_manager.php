@@ -8,7 +8,7 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 }
 
 // Kết nối cơ sở dữ liệu
-include 'C:\xampp\htdocs\math-app\database\db.php';
+include '../../../database/db.php';
 
 // Lấy danh sách bài học từ cơ sở dữ liệu
 $stmt = $conn->prepare("SELECT b.MaBaiHoc, b.TenBai, b.NoiDungLyThuyet, b.DuongDanVideo, c.TenChuong 
