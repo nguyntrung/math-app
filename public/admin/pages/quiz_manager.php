@@ -10,13 +10,13 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 // Kết nối cơ sở dữ liệu
 include '../../../database/db.php';
 
-// Lấy danh sách bài học từ cơ sở dữ liệu
-$stmt = $conn->prepare("SELECT b.MaBaiHoc, b.TenBai, b.NoiDungLyThuyet, b.DuongDanVideo, c.TenChuong 
-                         FROM baihoc b 
-                         JOIN chuonghoc c ON b.MaChuong = c.MaChuong 
-                         ORDER BY b.ThuTu ASC");
+// Lấy danh sách câu hỏi trắc nghiệm từ cơ sở dữ liệu
+$stmt = $conn->prepare("SELECT c.MaCauHoi, bh.TenBai, c.NoiDung, c.DapAnA, c.DapAnB, c.DapAnC, c.DapAnD, c.DapAnDung, c.GiaiThich 
+                         FROM cauhoitracnghiem c 
+                         JOIN baihoc bh ON c.MaBaiHoc = bh.MaBaiHoc 
+                         ORDER BY c.MaCauHoi ASC");
 $stmt->execute();
-$baiHocList = $stmt->fetchAll();
+$cauHoiList = $stmt->fetchAll();
 ?>
 
 <!doctype html>
@@ -27,85 +27,60 @@ $baiHocList = $stmt->fetchAll();
     <meta charset="utf-8" />
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-    <title>Quản lý bài học</title>
-    <meta name="description" content="" />
-    <!-- Favicon -->
+    <title>Quản lý câu hỏi trắc nghiệm</title>
     <link rel="icon" type="image/x-icon" href="../assets/img/favicon/favicon.ico" />
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&ampdisplay=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="../assets/vendor/fonts/remixicon/remixicon.css" />
-    <!-- Menu waves for no-customizer fix -->
     <link rel="stylesheet" href="../assets/vendor/libs/node-waves/node-waves.css" />
-    <!-- Core CSS -->
     <link rel="stylesheet" href="../assets/vendor/css/core.css" class="template-customizer-core-css" />
     <link rel="stylesheet" href="../assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
     <link rel="stylesheet" href="../assets/css/demo.css" />
-    <!-- Vendors CSS -->
     <link rel="stylesheet" href="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
-    <!-- Page CSS -->
-    <!-- Helpers -->
     <script src="../assets/vendor/js/helpers.js"></script>
     <script src="../assets/js/config.js"></script>
 </head>
 
 <body>
-    <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
         <div class="layout-container">
             <?php include 'sidebar.php'; ?>
-            <!-- Layout container -->
             <div class="layout-page">
                 <?php include 'navbar.php'; ?>
-                <!-- Content wrapper -->
                 <div class="content-wrapper">
-                    <!-- Content -->
                     <div class="container-xxl flex-grow-1 container-p-y">
                         <div class="card">
-                            <h5 class="card-header">Danh sách các bài học</h5>
+                            <h5 class="card-header">Danh sách câu hỏi trắc nghiệm</h5>
                             <div class="card-body">
                                 <div class="table-responsive text-nowrap">
                                     <table class="table table-bordered">
                                         <thead>
                                             <tr>
-                                                <th>Mã</th>
-                                                <th>Chương</th>
-                                                <th>Tên bài</th>
-                                                <th>Lý thuyết</th>
-                                                <th>Đường dẫn</th>
+                                                <th>Mã câu hỏi</th>
+                                                <th>Tên bài học</th>
+                                                <th>Nội dung câu hỏi</th>
+                                                <th>Câu trả lời đúng</th>
+                                                <th>Các lựa chọn</th>
+                                                <th>Giải Thích</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($baiHocList as $baiHoc): ?>
+                                            <?php foreach ($cauHoiList as $cauHoi): ?>
                                             <tr>
-                                                <td><?php echo htmlspecialchars($baiHoc['MaBaiHoc']); ?></td>
+                                                <td><?php echo htmlspecialchars($cauHoi['MaCauHoi']); ?></td>
+                                                <td><?php echo htmlspecialchars($cauHoi['TenBai']); ?></td>
+                                                <td><?php echo htmlspecialchars($cauHoi['NoiDung']); ?></td>
+                                                <td><?php echo htmlspecialchars($cauHoi['DapAnDung']); ?></td>
                                                 <td>
-                                                    <?php 
-                                                  $tenChuong = htmlspecialchars($baiHoc['TenChuong']);
-                                                  echo mb_substr($tenChuong, 0, 8) . (mb_strlen($tenChuong) > 8 ? '' : '');
-                                              ?>
+                                                    A: <?php echo htmlspecialchars($cauHoi['DapAnA']); ?>,
+                                                    B: <?php echo htmlspecialchars($cauHoi['DapAnB']); ?>,
+                                                    C: <?php echo htmlspecialchars($cauHoi['DapAnC']); ?>,
+                                                    D: <?php echo htmlspecialchars($cauHoi['DapAnD']); ?>
                                                 </td>
-                                                <td>
-                                                    <?php 
-                                                  $tenBai = htmlspecialchars($baiHoc['TenBai']);
-                                                  echo mb_substr($tenBai, 0,30) . (mb_strlen($tenBai) > 30 ? '...' : '');
-                                              ?>
-                                                </td>
-                                                <td>
-                                                    <?php 
-                                              $lyThuyet = htmlspecialchars($baiHoc['NoiDungLyThuyet']);
-                                              echo mb_substr($lyThuyet, 0, 20) . (mb_strlen($lyThuyet) > 20 ? '...' : ''); 
-                                              ?>
-                                                </td>
-                                                <td>
-                                                    <?php 
-                                              $duongDanVideo = htmlspecialchars($baiHoc['DuongDanVideo']);
-                                              echo mb_substr($duongDanVideo, 0, 20) . (mb_strlen($duongDanVideo) > 20 ? '...' : ''); 
-                                              ?>
-                                                </td>
+                                                <td><?php echo htmlspecialchars($cauHoi['GiaiThich']); ?></td>
                                                 <td>
                                                     <div class="dropdown">
                                                         <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
@@ -114,10 +89,10 @@ $baiHocList = $stmt->fetchAll();
                                                         </button>
                                                         <div class="dropdown-menu">
                                                             <a class="dropdown-item"
-                                                                href="add_update_lessons.php?id=<?php echo $baiHoc['MaBaiHoc']; ?>"><i
+                                                                href="add_update_multichoices.php?id=<?php echo $cauHoi['MaCauHoi']; ?>"><i
                                                                     class="ri-pencil-line me-1"></i> Chỉnh sửa</a>
                                                             <a class="dropdown-item" href="#"
-                                                                onclick="confirmDelete('<?php echo $baiHoc['MaBaiHoc']; ?>')"><i
+                                                                onclick="confirmDelete('<?php echo $cauHoi['MaCauHoi']; ?>')"><i
                                                                     class="ri-delete-bin-6-line me-1"></i> Xóa</a>
                                                         </div>
                                                     </div>
@@ -126,13 +101,13 @@ $baiHocList = $stmt->fetchAll();
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
-                                    <a href="add_update_lessons.php" class="btn btn-success mt-2">Thêm bài học</a>
+                                    <a href="add_update_quiz.php" class="btn btn-success mt-2 mb-2 " >Thêm câu hỏi</a>
+                                    <a href="#" class="btn btn-success mt-2 mb-2">Nhập Liệu Excel</a>
                                 </div>
                             </div>
                         </div>
                         <?php include 'footer.php'; ?>
                     </div>
-                    <!-- Content wrapper -->
                 </div>
             </div>
             <div class="layout-overlay layout-menu-toggle"></div>
@@ -147,7 +122,7 @@ $baiHocList = $stmt->fetchAll();
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        Bạn có chắc chắn muốn xóa bài học này?
+                        Bạn có chắc chắn muốn xóa câu trắc nghiệm này?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -156,22 +131,23 @@ $baiHocList = $stmt->fetchAll();
                 </div>
             </div>
         </div>
+    </div>
+    <script>
+    let maTracNghiemToDelete;
 
-        <script>
-            let maBaiHocToDelete; 
+    function confirmDelete(maTracNghiem) {
+        maTracNghiemToDelete = maTracNghiem; // Lưu mã câu hỏi vào biến toàn cục
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        deleteModal.show(); // Hiển thị modal
+    }
 
-            function confirmDelete(maBaiHoc) {
-                maBaiHocToDelete = maBaiHoc; // Lưu mã câu hỏi vào biến toàn cục
-                const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-                deleteModal.show(); // Hiển thị modal
-            }
+    // Xử lý khi nhấn nút xóa trong modal
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        window.location.href = 'delete.php?id=' + maTracNghiemToDelete +
+            '&table=cauhoitracnghiem&location=quiz_manager.php&idColumn=MaCauHoi';
+    });
+    </script>
 
-            // Xử lý khi nhấn nút xóa trong modal
-            document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-                window.location.href = 'delete.php?id=' + maBaiHocToDelete + '&table=baihoc&location=lessons_manager.php&idColumn=MaBaiHoc';
-            });
-        </script>
-</body>
 
 </body>
 

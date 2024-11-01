@@ -8,7 +8,7 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 }
 
 // Kết nối cơ sở dữ liệu
-include 'C:\xampp\htdocs\math-app\database\db.php';
+include '../../../database/db.php';
 
 // Khởi tạo biến cho các trường
 $maBaiHoc = '';
@@ -151,7 +151,7 @@ $chuongList = $stmt->fetchAll();
                                         <textarea class="form-control" id="noiDungLyThuyet" name="noiDungLyThuyet" rows="3" required><?php echo htmlspecialchars($noiDungLyThuyet); ?></textarea>
                                     </div>
                                     <button type="submit" class="btn btn-primary"><?php echo $maBaiHoc ? 'Cập nhật' : 'Thêm mới'; ?></button>
-                                    <a href="manage_lessons.php" class="btn btn-secondary">Quay lại</a>
+                                    <a href="lessons_manager.php" class="btn btn-secondary">Quay lại</a>
                                 </form>
                             </div>
                         </div>

@@ -10,13 +10,10 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 // Kết nối cơ sở dữ liệu
 include '../../../database/db.php';
 
-// Lấy danh sách bài học từ cơ sở dữ liệu
-$stmt = $conn->prepare("SELECT b.MaBaiHoc, b.TenBai, b.NoiDungLyThuyet, b.DuongDanVideo, c.TenChuong 
-                         FROM baihoc b 
-                         JOIN chuonghoc c ON b.MaChuong = c.MaChuong 
-                         ORDER BY b.ThuTu ASC");
+// Lấy danh sách chương học từ cơ sở dữ liệu
+$stmt = $conn->prepare("SELECT MaChuong, TenChuong, ThuTu, MienPhi FROM chuonghoc ORDER BY ThuTu ASC");
 $stmt->execute();
-$baiHocList = $stmt->fetchAll();
+$chuongHocList = $stmt->fetchAll();
 ?>
 
 <!doctype html>
@@ -27,7 +24,7 @@ $baiHocList = $stmt->fetchAll();
     <meta charset="utf-8" />
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-    <title>Quản lý bài học</title>
+    <title>Quản lý chương học</title>
     <meta name="description" content="" />
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="../assets/img/favicon/favicon.ico" />
@@ -64,48 +61,27 @@ $baiHocList = $stmt->fetchAll();
                     <!-- Content -->
                     <div class="container-xxl flex-grow-1 container-p-y">
                         <div class="card">
-                            <h5 class="card-header">Danh sách các bài học</h5>
+                            <h5 class="card-header">Danh sách chương học</h5>
                             <div class="card-body">
                                 <div class="table-responsive text-nowrap">
                                     <table class="table table-bordered">
                                         <thead>
                                             <tr>
-                                                <th>Mã</th>
-                                                <th>Chương</th>
-                                                <th>Tên bài</th>
-                                                <th>Lý thuyết</th>
-                                                <th>Đường dẫn</th>
+                                                <th>Mã chương</th>
+                                                <th>Tên chương</th>
+                                                <th>Thứ tự</th>
+                                                <th>Phí</th>
+
                                                 <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($baiHocList as $baiHoc): ?>
+                                            <?php foreach ($chuongHocList as $chuongHoc): ?>
                                             <tr>
-                                                <td><?php echo htmlspecialchars($baiHoc['MaBaiHoc']); ?></td>
-                                                <td>
-                                                    <?php 
-                                                  $tenChuong = htmlspecialchars($baiHoc['TenChuong']);
-                                                  echo mb_substr($tenChuong, 0, 8) . (mb_strlen($tenChuong) > 8 ? '' : '');
-                                              ?>
-                                                </td>
-                                                <td>
-                                                    <?php 
-                                                  $tenBai = htmlspecialchars($baiHoc['TenBai']);
-                                                  echo mb_substr($tenBai, 0,30) . (mb_strlen($tenBai) > 30 ? '...' : '');
-                                              ?>
-                                                </td>
-                                                <td>
-                                                    <?php 
-                                              $lyThuyet = htmlspecialchars($baiHoc['NoiDungLyThuyet']);
-                                              echo mb_substr($lyThuyet, 0, 20) . (mb_strlen($lyThuyet) > 20 ? '...' : ''); 
-                                              ?>
-                                                </td>
-                                                <td>
-                                                    <?php 
-                                              $duongDanVideo = htmlspecialchars($baiHoc['DuongDanVideo']);
-                                              echo mb_substr($duongDanVideo, 0, 20) . (mb_strlen($duongDanVideo) > 20 ? '...' : ''); 
-                                              ?>
-                                                </td>
+                                                <td><?php echo htmlspecialchars($chuongHoc['MaChuong']); ?></td>
+                                                <td><?php echo htmlspecialchars($chuongHoc['TenChuong']); ?></td>
+                                                <td><?php echo htmlspecialchars($chuongHoc['ThuTu']); ?></td>
+                                                <td><?php echo htmlspecialchars($chuongHoc['MienPhi']); ?></td>
                                                 <td>
                                                     <div class="dropdown">
                                                         <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
@@ -114,10 +90,10 @@ $baiHocList = $stmt->fetchAll();
                                                         </button>
                                                         <div class="dropdown-menu">
                                                             <a class="dropdown-item"
-                                                                href="add_update_lessons.php?id=<?php echo $baiHoc['MaBaiHoc']; ?>"><i
+                                                                href="add_update_chapter.php?id=<?php echo $chuongHoc['MaChuong']; ?>"><i
                                                                     class="ri-pencil-line me-1"></i> Chỉnh sửa</a>
                                                             <a class="dropdown-item" href="#"
-                                                                onclick="confirmDelete('<?php echo $baiHoc['MaBaiHoc']; ?>')"><i
+                                                                onclick="confirmDelete('<?php echo $chuongHoc['MaChuong']; ?>')"><i
                                                                     class="ri-delete-bin-6-line me-1"></i> Xóa</a>
                                                         </div>
                                                     </div>
@@ -126,7 +102,7 @@ $baiHocList = $stmt->fetchAll();
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
-                                    <a href="add_update_lessons.php" class="btn btn-success mt-2">Thêm bài học</a>
+                                    <a href="add_update_chapter.php" class="btn btn-success mt-2">Thêm chương học</a>
                                 </div>
                             </div>
                         </div>
@@ -147,7 +123,7 @@ $baiHocList = $stmt->fetchAll();
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        Bạn có chắc chắn muốn xóa bài học này?
+                        Bạn có chắc chắn muốn xóa chương này?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -158,21 +134,20 @@ $baiHocList = $stmt->fetchAll();
         </div>
 
         <script>
-            let maBaiHocToDelete; 
+        let maChuongToDelete;
 
-            function confirmDelete(maBaiHoc) {
-                maBaiHocToDelete = maBaiHoc; // Lưu mã câu hỏi vào biến toàn cục
-                const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-                deleteModal.show(); // Hiển thị modal
-            }
+        function confirmDelete(maChuong) {
+            maChuongToDelete = maChuong; // Lưu mã câu hỏi vào biến toàn cục
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            deleteModal.show(); // Hiển thị modal
+        }
 
-            // Xử lý khi nhấn nút xóa trong modal
-            document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-                window.location.href = 'delete.php?id=' + maBaiHocToDelete + '&table=baihoc&location=lessons_manager.php&idColumn=MaBaiHoc';
-            });
+        // Xử lý khi nhấn nút xóa trong modal
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            window.location.href = 'delete.php?id=' + maChuongToDelete +
+                '&table=chuonghoc&location=chapter_manager.php&idColumn=MaChuong';
+        });
         </script>
-</body>
-
 </body>
 
 </html>

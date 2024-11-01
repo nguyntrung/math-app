@@ -84,20 +84,43 @@
     </li>
 
     <!-- Forms & Tables -->
-    <li class="menu-header fw-medium mt-4"><span class="menu-header-text">Thao tác</span></li>
+    <li class="menu-header fw-medium mt-4"><span class="menu-header-text">DỮ LIỆU</u></span></li>
     <!-- Tables -->
     <li class="menu-item active">
-        <a href="tables-basic.html" class="menu-link">
+        <a href="chapter_manager.php" class="menu-link">
         <i class="menu-icon tf-icons ri-table-alt-line"></i>
-        <div data-i18n="Tables">Chương học</div>
+        <div data-i18n="Tables">Chương Học</div>
         </a>
     </li>
     <li class="menu-item active">
         <a href="lessons_manage.php" class="menu-link">
         <i class="menu-icon tf-icons ri-table-alt-line"></i>
-        <div data-i18n="Tables">Bài học</div>
+        <div data-i18n="Tables">Bài Học</div>
         </a>
     </li>
+    <li class="menu-item active">
+        <a href="solutions_manager.php" class="menu-link">
+        <i class="menu-icon tf-icons ri-table-alt-line"></i>
+        <div data-i18n="Tables">Bài Giải</div>
+        </a>
+    </li>
+    <li class="menu-item active">
+        <a href="quiz_manager.php" class="menu-link">
+        <i class="menu-icon tf-icons ri-table-alt-line"></i>
+        <div data-i18n="Tables">Câu Hỏi Trắc Nghiệm</div>
+        </a>
+    </li>
+    <li class="menu-item active">
+        <a href="essay_manager.php" class="menu-link">
+        <i class="menu-icon tf-icons ri-table-alt-line"></i>
+        <div data-i18n="Tables">Câu Hỏi Tự Luận</div>
+        </a>
+    </li>
+
+
+
+
+
     <!-- Misc -->
     <li class="menu-header mt-7"><span class="menu-header-text">Misc</span></li>
     <li class="menu-item">
