@@ -87,7 +87,7 @@
     <li class="menu-header fw-medium mt-4"><span class="menu-header-text">DỮ LIỆU</u></span></li>
     <!-- Tables -->
     <li class="menu-item active">
-        <a href="tables-basic.html" class="menu-link">
+        <a href="chapter_manager.php" class="menu-link">
         <i class="menu-icon tf-icons ri-table-alt-line"></i>
         <div data-i18n="Tables">Chương Học</div>
         </a>
@@ -105,13 +105,13 @@
         </a>
     </li>
     <li class="menu-item active">
-        <a href="lessons_manager.php" class="menu-link">
+        <a href="multichoices_manager.php" class="menu-link">
         <i class="menu-icon tf-icons ri-table-alt-line"></i>
         <div data-i18n="Tables">Câu Hỏi Trắc Nghiệm</div>
         </a>
     </li>
     <li class="menu-item active">
-        <a href="lessons_manager.php" class="menu-link">
+        <a href="essay_manager.php" class="menu-link">
         <i class="menu-icon tf-icons ri-table-alt-line"></i>
         <div data-i18n="Tables">Câu Hỏi Tự Luận</div>
         </a>
