@@ -177,7 +177,7 @@ $baiHocList = $stmt->fetchAll();
                                         <textarea class="form-control" id="giaiThich" name="giaiThich" rows="4" required><?php echo htmlspecialchars($giaiThich); ?></textarea>
                                     </div>
                                     <button type="submit" class="btn btn-primary"><?php echo $maCauHoi ? 'Cập nhật' : 'Thêm mới'; ?></button>
-                                    <a href="multichoices_manager.php" class="btn btn-secondary">Quay lại</a>
+                                    <a href="quiz_manager.php" class="btn btn-secondary">Quay lại</a>
                                 </form>
                             </div>
                         </div>

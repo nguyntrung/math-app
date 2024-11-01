@@ -91,7 +91,8 @@ $cauHoiList = $stmt->fetchAll();
                                                             <a class="dropdown-item"
                                                                 href="add_update_multichoices.php?id=<?php echo $cauHoi['MaCauHoi']; ?>"><i
                                                                     class="ri-pencil-line me-1"></i> Chỉnh sửa</a>
-                                                            <a class="dropdown-item" href="#"><i
+                                                            <a class="dropdown-item" href="#"
+                                                                onclick="confirmDelete('<?php echo $cauHoi['MaCauHoi']; ?>')"><i
                                                                     class="ri-delete-bin-6-line me-1"></i> Xóa</a>
                                                         </div>
                                                     </div>
@@ -100,8 +101,8 @@ $cauHoiList = $stmt->fetchAll();
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
-                                    <a href="add_update_multichoices.php" class="btn btn-success mt-2">Thêm câu hỏi</a>
-                                    <a href="#" class="btn btn-success mt-2">Nhập Liệu Excel</a>
+                                    <a href="add_update_quiz.php" class="btn btn-success mt-2 mb-2 " >Thêm câu hỏi</a>
+                                    <a href="#" class="btn btn-success mt-2 mb-2">Nhập Liệu Excel</a>
                                 </div>
                             </div>
                         </div>
@@ -112,7 +113,42 @@ $cauHoiList = $stmt->fetchAll();
             <div class="layout-overlay layout-menu-toggle"></div>
         </div>
         <?php include 'other.php'; ?>
+        <!-- Modal Xác Nhận Xóa -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Xác Nhận Xóa</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn xóa câu trắc nghiệm này?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Xóa</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    <script>
+    let maTracNghiemToDelete;
+
+    function confirmDelete(maTracNghiem) {
+        maTracNghiemToDelete = maTracNghiem; // Lưu mã câu hỏi vào biến toàn cục
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        deleteModal.show(); // Hiển thị modal
+    }
+
+    // Xử lý khi nhấn nút xóa trong modal
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        window.location.href = 'delete.php?id=' + maTracNghiemToDelete +
+            '&table=cauhoitracnghiem&location=quiz_manager.php&idColumn=MaCauHoi';
+    });
+    </script>
+
+
 </body>
 
 </html>

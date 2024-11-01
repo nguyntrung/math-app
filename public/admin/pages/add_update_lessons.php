@@ -149,7 +149,7 @@ $chuongList = $stmt->fetchAll();
                                         <textarea class="form-control" id="noiDungLyThuyet" name="noiDungLyThuyet" rows="3" required><?php echo htmlspecialchars($noiDungLyThuyet); ?></textarea>
                                     </div>
                                     <button type="submit" class="btn btn-primary"><?php echo $maBaiHoc ? 'Cập nhật' : 'Thêm mới'; ?></button>
-                                    <a href="manage_lessons.php" class="btn btn-secondary">Quay lại</a>
+                                    <a href="lessons_manager.php" class="btn btn-secondary">Quay lại</a>
                                 </form>
                             </div>
                         </div>

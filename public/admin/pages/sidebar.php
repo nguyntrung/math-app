@@ -105,7 +105,7 @@
         </a>
     </li>
     <li class="menu-item active">
-        <a href="multichoices_manager.php" class="menu-link">
+        <a href="quiz_manager.php" class="menu-link">
         <i class="menu-icon tf-icons ri-table-alt-line"></i>
         <div data-i18n="Tables">Câu Hỏi Trắc Nghiệm</div>
         </a>

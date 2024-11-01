@@ -14,6 +14,7 @@ include '../../../database/db.php';
 $maChuong = '';
 $tenChuong = '';
 $mienPhi = '';
+$thuTu = '';
 $errorMessage = '';
 $successMessage = '';
 
@@ -22,7 +23,7 @@ if (isset($_GET['id'])) {
     $maChuong = $_GET['id'];
     
     // Lấy thông tin chương học từ cơ sở dữ liệu
-    $stmt = $conn->prepare("SELECT MaChuong, TenChuong, MienPhi FROM chuonghoc WHERE MaChuong = ?");
+    $stmt = $conn->prepare("SELECT MaChuong, TenChuong, ThuTu, MienPhi FROM chuonghoc WHERE MaChuong = ? ORDER BY MaChuong ASC");
     $stmt->execute([$maChuong]);
     $chuongHoc = $stmt->fetch();
     
@@ -44,16 +45,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         if ($maChuong) {
             // Cập nhật chương học
-            $stmt = $conn->prepare("UPDATE chuonghoc SET TenChuong = ?, MienPhi = ? WHERE MaChuong = ?");
-            if ($stmt->execute([$tenChuong, $maChuong, $mienPhi])) {
+            $stmt = $conn->prepare("UPDATE chuonghoc SET TenChuong = ?, ThuTu = ?, MienPhi = ? WHERE MaChuong = ?");
+            if ($stmt->execute([$tenChuong, $thuTu, $mienPhi, $maChuong])) {
                 $successMessage = 'Cập nhật chương học thành công!';
             } else {
                 $errorMessage = 'Có lỗi xảy ra khi cập nhật chương học!';
             }
         } else {
             // Thêm chương học mới
-            $stmt = $conn->prepare("INSERT INTO chuonghoc (TenChuong, MienPhi) VALUES (?, ?)");
-            if ($stmt->execute([$tenChuong, $mienPhi])) {
+            $stmt = $conn->prepare("INSERT INTO chuonghoc (TenChuong, ThuTu, MienPhi) VALUES (?, ?, ?)");
+            if ($stmt->execute([$tenChuong, $thuTu, $mienPhi])) {
                 $successMessage = 'Thêm chương học thành công!';
             } else {
                 $errorMessage = 'Có lỗi xảy ra khi thêm chương học!';
@@ -109,6 +110,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <label for="tenChuong" class="form-label">Tên chương</label>
                                         <input type="text" class="form-control" id="tenChuong" name="tenChuong"
                                             value="<?php echo htmlspecialchars($tenChuong); ?>" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="tenChuong" class="form-label">Thứ Tự</label>
+                                        <input type="text" class="form-control" id="thuTu" name="thuTu"
+                                            value="<?php echo htmlspecialchars($thuTu); ?>" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="tenChuong" class="form-label">Miễn Phí</label>
