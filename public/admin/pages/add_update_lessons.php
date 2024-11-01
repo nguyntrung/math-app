@@ -44,9 +44,9 @@ if (isset($_GET['id'])) {
 // Xử lý thêm hoặc cập nhật bài học
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tenBai = $_POST['tenBai'];
-    $noiDungLyThuyet = $_POST['noiDungLyThuyet'];
+    $noiDungLyThuyet = $_POST['noiDungLyThuyet']; // Giá trị từ CKEditor
     $duongDanVideo = $_POST['duongDanVideo'];
-    $maChuong = $_POST['maChuong']; // Cần truyền thêm mã chương
+    $maChuong = $_POST['maChuong'];
 
     if (empty($tenBai) || empty($noiDungLyThuyet)) {
         $errorMessage = 'Vui lòng điền tất cả các trường.';
@@ -107,6 +107,8 @@ $chuongList = $stmt->fetchAll();
     <!-- Helpers -->
     <script src="../assets/vendor/js/helpers.js"></script>
     <script src="../assets/js/config.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/34.1.0/classic/ckeditor.js"></script>
+    <script src="../ckeditor/ckeditor5.js"></script>
 </head>
 <body>
     <div class="layout-wrapper layout-content-navbar">
@@ -160,5 +162,13 @@ $chuongList = $stmt->fetchAll();
         <div class="layout-overlay layout-menu-toggle"></div>
     </div>
     <?php include 'other.php'; ?>
+
+    <script>
+        ClassicEditor
+            .create(document.querySelector('#noiDungLyThuyet'))
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
 </body>
 </html>
