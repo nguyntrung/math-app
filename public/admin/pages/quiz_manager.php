@@ -58,10 +58,10 @@ $cauHoiList = $stmt->fetchAll();
                                     <table class="table table-bordered">
                                         <thead>
                                             <tr>
-                                                <th>Mã câu hỏi</th>
+                                                <th>Mã</th>
                                                 <th>Tên bài học</th>
                                                 <th>Nội dung câu hỏi</th>
-                                                <th>Câu trả lời đúng</th>
+                                                <th>Đúng</th>
                                                 <th>Các lựa chọn</th>
                                                 <th>Giải Thích</th>
                                                 <th></th>
@@ -70,17 +70,44 @@ $cauHoiList = $stmt->fetchAll();
                                         <tbody>
                                             <?php foreach ($cauHoiList as $cauHoi): ?>
                                             <tr>
-                                                <td><?php echo htmlspecialchars($cauHoi['MaCauHoi']); ?></td>
-                                                <td><?php echo htmlspecialchars($cauHoi['TenBai']); ?></td>
-                                                <td><?php echo htmlspecialchars($cauHoi['NoiDung']); ?></td>
-                                                <td><?php echo htmlspecialchars($cauHoi['DapAnDung']); ?></td>
+                                                <td class="text-center"><?php echo htmlspecialchars($cauHoi['MaCauHoi']); ?></td>
                                                 <td>
-                                                    A: <?php echo htmlspecialchars($cauHoi['DapAnA']); ?>,
-                                                    B: <?php echo htmlspecialchars($cauHoi['DapAnB']); ?>,
-                                                    C: <?php echo htmlspecialchars($cauHoi['DapAnC']); ?>,
-                                                    D: <?php echo htmlspecialchars($cauHoi['DapAnD']); ?>
+                                                    <?php 
+                                                    $tenBai = htmlspecialchars($cauHoi['TenBai']); 
+                                                    echo mb_substr($tenBai, 0, 20) . (mb_strlen($tenBai) > 20 ? '...' : '');
+                                                    ?>
                                                 </td>
-                                                <td><?php echo htmlspecialchars($cauHoi['GiaiThich']); ?></td>
+                                                <td>
+                                                    <?php 
+                                                    $noiDung = htmlspecialchars($cauHoi['NoiDung']); 
+                                                    echo mb_substr($noiDung, 0, 30) . (mb_strlen($noiDung) > 20 ? '...' : '');
+                                                    ?>
+                                                </td>
+                                                <td class="text-center"><?php echo htmlspecialchars($cauHoi['DapAnDung']); ?></td>
+                                                <td>
+                                                    A: <?php 
+                                                        $dapAnA = htmlspecialchars($cauHoi['DapAnA']); 
+                                                        echo mb_substr($dapAnA, 0, 2) . (mb_strlen($dapAnA) > 2 ? '...' : ''); 
+                                                    ?>,
+                                                    B: <?php 
+                                                        $dapAnB = htmlspecialchars($cauHoi['DapAnB']); 
+                                                        echo mb_substr($dapAnB, 0, 2) . (mb_strlen($dapAnB) > 2 ? '...' : ''); 
+                                                    ?>,
+                                                    C: <?php 
+                                                        $dapAnC = htmlspecialchars($cauHoi['DapAnC']); 
+                                                        echo mb_substr($dapAnC, 0, 2) . (mb_strlen($dapAnC) > 2 ? '...' : ''); 
+                                                    ?>,
+                                                    D: <?php 
+                                                        $dapAnD = htmlspecialchars($cauHoi['DapAnD']); 
+                                                        echo mb_substr($dapAnD, 0, 2) . (mb_strlen($dapAnD) > 2 ? '...' : ''); 
+                                                    ?>
+                                                </td>
+                                                <td>
+                                                    <?php 
+                                                    $giaiThich = htmlspecialchars($cauHoi['GiaiThich']); 
+                                                    echo mb_substr($giaiThich, 0, 15) . (mb_strlen($giaiThich) > 15 ? '...' : ''); 
+                                                    ?>
+                                                </td>
                                                 <td>
                                                     <div class="dropdown">
                                                         <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
@@ -89,7 +116,7 @@ $cauHoiList = $stmt->fetchAll();
                                                         </button>
                                                         <div class="dropdown-menu">
                                                             <a class="dropdown-item"
-                                                                href="add_update_multichoices.php?id=<?php echo $cauHoi['MaCauHoi']; ?>"><i
+                                                                href="add_update_quiz.php?id=<?php echo $cauHoi['MaCauHoi']; ?>"><i
                                                                     class="ri-pencil-line me-1"></i> Chỉnh sửa</a>
                                                             <a class="dropdown-item" href="#"
                                                                 onclick="confirmDelete('<?php echo $cauHoi['MaCauHoi']; ?>')"><i

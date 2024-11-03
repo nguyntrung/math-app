@@ -72,7 +72,12 @@ $baiGiaiList = $stmt->fetchAll();
                                             <tr>
                                                 <td><?php echo htmlspecialchars($baiGiai['MaBaiGiai']); ?></td>
                                                 <td><?php echo htmlspecialchars($baiGiai['MaBaiHoc']); ?></td>
-                                                <td><?php echo htmlspecialchars($baiGiai['TenBai']); ?></td>
+                                                <td>
+                                                    <?php 
+                                                        $tenBai = htmlspecialchars($baiGiai['TenBai']); 
+                                                        echo mb_substr($tenBai, 0, 47) . (mb_strlen($tenBai) > 50 ? '...' : '');
+                                                    ?>
+                                                </td>
                                                 <td><?php echo mb_substr(htmlspecialchars($baiGiai['Bai']), 0, 30) . (mb_strlen($baiGiai['Bai']) > 30 ? '...' : ''); ?>
                                                 </td>
                                                 <td><?php echo mb_substr(htmlspecialchars($baiGiai['LoiGiai']), 0, 30) . (mb_strlen($baiGiai['LoiGiai']) > 30 ? '...' : ''); ?>
