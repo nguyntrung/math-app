@@ -169,8 +169,12 @@ $baiHocList = $stmt->fetchAll();
                                     </div>
                                     <div class="mb-3">
                                         <label for="dapAnDung" class="form-label">Đáp án đúng</label>
-                                        <input type="text" class="form-control" id="dapAnDung" name="dapAnDung"
-                                            value="<?php echo htmlspecialchars($dapAnDung); ?>" required>
+                                        <select class="form-control" id="dapAnDung" name="dapAnDung" required>
+                                            <option value="A" <?php if ($dapAnDung === 'A') echo 'selected'; ?>>A</option>
+                                            <option value="B" <?php if ($dapAnDung === 'B') echo 'selected'; ?>>B</option>
+                                            <option value="C" <?php if ($dapAnDung === 'C') echo 'selected'; ?>>C</option>
+                                            <option value="D" <?php if ($dapAnDung === 'D') echo 'selected'; ?>>D</option>
+                                        </select>
                                     </div>
                                     <div class="mb-3">
                                         <label for="giaiThich" class="form-label">Giải Thích</label>

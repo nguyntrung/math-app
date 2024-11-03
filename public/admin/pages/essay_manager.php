@@ -82,8 +82,18 @@ $cauHoiList = $stmt->fetchAll();
                                             <?php foreach ($cauHoiList as $cauHoi): ?>
                                             <tr>
                                                 <td><?php echo htmlspecialchars($cauHoi['MaCauHoi']); ?></td>
-                                                <td><?php echo htmlspecialchars($cauHoi['TenBai']); ?></td>
-                                                <td><?php echo htmlspecialchars($cauHoi['NoiDung']); ?></td>
+                                                <td>
+                                                    <?php 
+                                                    $tenBai = htmlspecialchars($cauHoi['TenBai']); 
+                                                    echo mb_substr($tenBai, 0, 20) . (mb_strlen($tenBai) > 20 ? '...' : '');
+                                                    ?>
+                                                </td>
+                                                <td>
+                                                    <?php 
+                                                    $noiDung = htmlspecialchars($cauHoi['NoiDung']); 
+                                                    echo mb_substr($noiDung, 0, 40) . (mb_strlen($noiDung) > 20 ? '...' : '');
+                                                    ?>
+                                                </td>
                                                 <td><?php echo htmlspecialchars($cauHoi['LoiGiai']); ?></td>
                                                 <td><?php echo htmlspecialchars($cauHoi['GiaiThich']); ?></td>
                                                 <td>

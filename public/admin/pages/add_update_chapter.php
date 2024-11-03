@@ -23,15 +23,23 @@ if (isset($_GET['id'])) {
     $maChuong = $_GET['id'];
     
     // Lấy thông tin chương học từ cơ sở dữ liệu
-    $stmt = $conn->prepare("SELECT MaChuong, TenChuong, ThuTu, MienPhi FROM chuonghoc WHERE MaChuong = ? ORDER BY MaChuong ASC");
+    $stmt = $conn->prepare("SELECT MaChuong, TenChuong, ThuTu, MienPhi FROM chuonghoc WHERE MaChuong = ?");
     $stmt->execute([$maChuong]);
     $chuongHoc = $stmt->fetch();
     
     if ($chuongHoc) {
         $tenChuong = $chuongHoc['TenChuong'];
+        $thuTu = $chuongHoc['ThuTu']; // Lấy thứ tự khi chỉnh sửa
+        $mienPhi = $chuongHoc['MienPhi'];
     } else {
         $errorMessage = 'Chương học không tồn tại!';
     }
+} else {
+    // Lấy thứ tự lớn nhất nếu không có mã chương để chỉnh sửa
+    $stmt = $conn->prepare("SELECT MAX(ThuTu) AS MaxThuTu FROM chuonghoc");
+    $stmt->execute();
+    $result = $stmt->fetch();
+    $thuTu = $result['MaxThuTu'] ? $result['MaxThuTu'] + 1 : 1; // Tăng lên 1 hoặc đặt thành 1 nếu không có
 }
 
 // Xử lý thêm hoặc cập nhật chương học
@@ -114,12 +122,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <div class="mb-3">
                                         <label for="tenChuong" class="form-label">Thứ Tự</label>
                                         <input type="text" class="form-control" id="thuTu" name="thuTu"
-                                            value="<?php echo htmlspecialchars($thuTu); ?>" required>
+                                            value="<?php echo htmlspecialchars($thuTu); ?>" required readonly>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="tenChuong" class="form-label">Miễn Phí</label>
-                                        <input type="text" class="form-control" id="mienPhi" name="mienPhi"
-                                            value="<?php echo htmlspecialchars($mienPhi); ?>" required>
+                                        <label for="mienPhi" class="form-label">Miễn Phí</label>
+                                        <select class="form-control" id="mienPhi" name="mienPhi" required>
+                                            <option value="0" <?php echo ($mienPhi == 0) ? 'selected' : ''; ?>>Miễn Phí</option>
+                                            <option value="1" <?php echo ($mienPhi == 1) ? 'selected' : ''; ?>>Tính Phí</option>
+                                        </select>
                                     </div>
                                     <button type="submit" class="btn btn-primary"><?php echo $maChuong ? 'Cập nhật' : 'Thêm mới'; ?></button>
                                     <a href="chapter_manager.php" class="btn btn-secondary">Quay lại</a>

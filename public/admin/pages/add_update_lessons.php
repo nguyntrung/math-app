@@ -151,7 +151,7 @@ $chuongList = $stmt->fetchAll();
                                         <textarea class="form-control" id="noiDungLyThuyet" name="noiDungLyThuyet" rows="3" required><?php echo htmlspecialchars($noiDungLyThuyet); ?></textarea>
                                     </div>
                                     <button type="submit" class="btn btn-primary"><?php echo $maBaiHoc ? 'Cập nhật' : 'Thêm mới'; ?></button>
-                                    <a href="lessons_manager.php" class="btn btn-secondary">Quay lại</a>
+                                    <a href="lessons_manage.php" class="btn btn-secondary">Quay lại</a>
                                 </form>
                             </div>
                         </div>
@@ -164,11 +164,13 @@ $chuongList = $stmt->fetchAll();
     <?php include 'other.php'; ?>
 
     <script>
-        ClassicEditor
-            .create(document.querySelector('#noiDungLyThuyet'))
-            .catch(error => {
-                console.error(error);
-            });
+        document.addEventListener('DOMContentLoaded', function() {
+            ClassicEditor
+                .create(document.querySelector('#noiDungLyThuyet'))
+                .catch(error => {
+                    console.error(error);
+                });
+        });
     </script>
 </body>
 </html>
