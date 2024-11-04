@@ -19,10 +19,13 @@
                         <a href="../public/essay.php" class="dropdown-item">Bài tập tự luận</a>
                         <a href="../public/quiz.php" class="dropdown-item">Bài tập trắc nghiệm</a>
                         <a href="../public/solutions.php" class="dropdown-item">Giải bài tập SGK</a>
+                        <a href="../public/quiz_check_15.php" class="dropdown-item">Kiểm tra 15 phút</a>
+                        <a href="#" class="dropdown-item">Kiểm tra 1 tiết</a>
+                        <a href="../public/exercise.php" class="dropdown-item">Ôn tập</a>
                     </div>
                 </div>
                 <a href="contact.html" class="nav-item nav-link">Liên hệ</a>
-                <a href="about.html" class="nav-item nav-link">Về chúng tôi</a>
+                <a href="about.php" class="nav-item nav-link">Về chúng tôi</a>
             </div>
             <?php if (isset($_SESSION['HoTen'])): ?>
                 <div class="nav-item dropdown">

@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Kiểm tra nếu chưa đăng nhập
 if (!isset($_SESSION['MaNguoiDung'])) {
     header('Location: login.php');
     exit();
@@ -10,7 +9,6 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 include '../database/db.php';
 
 try {
-    // Lấy danh sách các chương và bài học từ cơ sở dữ liệu
     $stmt = $conn->prepare("
         SELECT ChuongHoc.MaChuong, ChuongHoc.TenChuong, BaiHoc.MaBaiHoc, BaiHoc.TenBai 
         FROM ChuongHoc
@@ -20,7 +18,6 @@ try {
     $stmt->execute();
     $chuongBaiHocList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Tạo mảng để nhóm các bài học theo chương
     $chuongData = [];
     foreach ($chuongBaiHocList as $row) {
         $maChuong = $row['MaChuong'];
@@ -28,7 +25,6 @@ try {
         $maBaiHoc = $row['MaBaiHoc'];
         $tenBaiHoc = $row['TenBai'];
 
-        // Kiểm tra xem chương đã tồn tại chưa
         if (!isset($chuongData[$maChuong])) {
             $chuongData[$maChuong] = [
                 'tenChuong' => $tenChuong,
@@ -36,7 +32,6 @@ try {
             ];
         }
 
-        // Thêm bài học vào chương
         if ($maBaiHoc) {
             $chuongData[$maChuong]['baiHocList'][] = [
                 'maBaiHoc' => $maBaiHoc,
@@ -51,57 +46,183 @@ try {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Danh sách bài giảng</title>
+    <title>Kho Báu Kiến Thức</title>
 
     <?php include '../includes/styles.php'; ?>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #c2e9fb 0%, #a1c4fd 100%);
+        }
+
+        .main-title {
+            color: #ff6b6b;
+            text-align: center;
+            font-size: 2.5rem;
+            margin: 2rem 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .chapter-card {
+            background: white;
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .chapter-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .chapter-header {
+            background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 20px 20px 0 0;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .lesson-item {
+            border: none;
+            margin: 10px;
+            border-radius: 15px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            padding: 12px;
+        }
+
+        .lesson-item:hover {
+            background: #fff3f3;
+            transform: scale(1.02);
+        }
+
+        .lesson-link {
+            color: #5b6c8d;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .lesson-link:hover {
+            color: #ff6b6b;
+            text-decoration: none;
+        }
+
+        .lesson-icon {
+            width: 150px;
+            margin-right: 15px;
+            border-radius: 10px
+            /* animation: wiggle 2s infinite; */
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .back-to-top:hover {
+            background: #ff8787;
+            transform: translateY(-5px);
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: #666;
+            background: white;
+            border-radius: 20px;
+            margin: 2rem auto;
+            max-width: 500px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
 <body>
     <?php include '../includes/navbar.php'; ?>
     
-    <!-- Phần Chính Bắt Đầu -->
-    <div class="container-fluid pt-5">
+    <div class="container-fluid pt-4">
         <div class="container pb-5">
-            <h1 class="text-center mb-4">Danh sách bài học</h1>
+            <h1 class="main-title">
+                <i class="fas fa-book-reader mr-2"></i>
+                Kho Báu Kiến Thức
+            </h1>
             
             <?php if (!empty($chuongData)): ?>
                 <?php foreach ($chuongData as $maChuong => $chuong): ?>
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <h5><?= htmlspecialchars($chuong['tenChuong']); ?></h5>
+                    <div class="chapter-card">
+                        <div class="chapter-header">
+                            <i class="fas fa-star mr-2"></i>
+                            <?= htmlspecialchars($chuong['tenChuong']); ?>
                         </div>
-                        <ul class="list-group">
+                        <div class="p-3">
                             <?php if (!empty($chuong['baiHocList'])): ?>
                                 <?php foreach ($chuong['baiHocList'] as $baiHoc): ?>
-                                    <li class="list-group-item">
-                                        <a href="video_lessons_detail.php?maBaiHoc=<?= htmlspecialchars($baiHoc['maBaiHoc']); ?>" class="text-primary d-flex align-items-center">
-                                            <img src="../assets/img/video.png" alt="<?= htmlspecialchars($baiHoc['tenBaiHoc']); ?>" class="img-fluid mr-2" style="width: 20px;">
-                                            <strong><?= htmlspecialchars($baiHoc['tenBaiHoc']); ?></strong>
+                                    <div class="lesson-item">
+                                        <a href="video_lessons_detail.php?maBaiHoc=<?= htmlspecialchars($baiHoc['maBaiHoc']); ?>" 
+                                           class="lesson-link">
+                                            <img src="../assets/img/learning.png" 
+                                                 alt="Bài học" 
+                                                 class="lesson-icon">
+                                            <span><?= htmlspecialchars($baiHoc['tenBaiHoc']); ?></span>
                                         </a>
-                                    </li>
+                                    </div>
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <li class="list-group-item">Không có bài học trong chương này.</li>
+                                <div class="empty-message">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    Chưa có bài học nào trong chương này
+                                </div>
                             <?php endif; ?>
-                        </ul>
+                        </div>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <p class="text-center">Hiện tại chưa có chương và bài học nào.</p>
+                <div class="empty-message">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    Hiện tại chưa có bài học nào
+                </div>
             <?php endif; ?>
         </div>
     </div>
-    <!-- Phần Chính Kết Thúc -->
+
+    <a href="#" class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </a>
 
     <?php include '../includes/footer.php'; ?>
-
-    <!-- Quay Lên Trên -->
-    <a href="#" class="btn btn-primary p-3 back-to-top"><i class="fa-solid fa-up-long"></i></a>
-
     <?php include '../includes/scripts.php'; ?>
 </body>
 </html>
