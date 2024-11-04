@@ -50,6 +50,42 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chi tiết bài giảng</title>
     <?php include '../includes/styles.php'; ?>
+    <style>
+        body {
+            background-color: #e9f5ff;
+        }
+        h4 {
+            color: #ff6347;
+            text-shadow: 1px 1px 2px #fff;
+        }
+        .video-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .related-links {
+            margin-top: 20px;
+        }
+        .related-links a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .related-links a:hover {
+            color: #ff6347;
+        }
+        .next-lesson {
+            margin-top: 30px;
+            font-weight: bold;
+        }
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 24px;
+        }
+    </style>
 </head>
 <body>
     <?php include '../includes/navbar.php'; ?>
@@ -60,28 +96,30 @@ try {
             <h4><?= htmlspecialchars($tenBaiHoc); ?></h4> <!-- Hiển thị tên bài học -->
 
             <!-- Video bài giảng -->
-            <?php if ($duongDanVideo): ?>
-                <video controls class="w-100 mb-3">
-                    <source src="<?= htmlspecialchars($duongDanVideo); ?>" type="video/mp4">
-                    Trình duyệt của bạn không hỗ trợ video.
-                </video>
-            <?php else: ?>
-                <p>Không có video cho bài học này.</p>
-            <?php endif; ?>
+            <div class="video-container">
+                <?php if ($duongDanVideo): ?>
+                    <video controls class="w-100 mb-3">
+                        <source src="<?= htmlspecialchars($duongDanVideo); ?>" type="video/mp4">
+                        Trình duyệt của bạn không hỗ trợ video.
+                    </video>
+                <?php else: ?>
+                    <p>Không có video cho bài học này.</p>
+                <?php endif; ?>
+            </div>
 
             <!-- Liên kết đến các bài tập -->
-            <div>
+            <div class="related-links">
                 <strong>Bài học liên quan:</strong>
+                <ul class="list-unstyled">
+                    <li>- <a href="theory_lessons.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Lý thuyết</a></li>
+                    <li>- <a href="essay_detail.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Bài tập tự luận</a></li>
+                    <li>- <a href="quiz_detail.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Bài tập trắc nghiệm</a></li>
+                </ul>
             </div>
-            <ul class="list-unstyled">
-                <li>- <a href="theory_lessons.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Lý thuyết</a></li>
-                <li>- <a href="essay_detail.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Bài tập tự luận</a></li>
-                <li>- <a href="quiz_detail.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Bài tập trắc nghiệm</a></li>
-            </ul>
 
             <!-- Liên kết đến bài học tiếp theo -->
             <?php if ($nextLesson): ?>
-                <div class="mt-3">
+                <div class="next-lesson">
                     <strong>Bài học tiếp theo:</strong><br>
                     <a href="video_lessons_detail.php?maBaiHoc=<?= htmlspecialchars($nextLesson['MaBaiHoc']); ?>">
                         <?= htmlspecialchars($nextLesson['TenBai']); ?>

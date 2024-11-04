@@ -17,3 +17,5 @@
 
 <!-- Custom Stylesheet -->
 <link href="../assets/css/style.css" rel="stylesheet">
+
+<link rel="icon" type="image/png" sizes="96x96" href="../assets/img/favicon.png">
