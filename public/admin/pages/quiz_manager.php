@@ -129,7 +129,6 @@ $cauHoiList = $stmt->fetchAll();
                                         </tbody>
                                     </table>
                                     <a href="add_update_quiz.php" class="btn btn-success mt-2 mb-2 " >Thêm câu hỏi</a>
-                                    <a href="#" class="btn btn-success mt-2 mb-2">Nhập Liệu Excel</a>
                                 </div>
                             </div>
                         </div>
