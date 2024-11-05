@@ -167,9 +167,25 @@ $chuongList = $stmt->fetchAll();
         document.addEventListener('DOMContentLoaded', function() {
             ClassicEditor
                 .create(document.querySelector('#noiDungLyThuyet'))
+                .then(editor => {
+                    editor.model.document.on('change:data', () => {
+                        const data = editor.getData();
+                        document.querySelector('#noiDungLyThuyet').value = data; // Cập nhật giá trị cho textarea
+                    });
+                })
                 .catch(error => {
                     console.error(error);
                 });
+        });
+
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function() {
+            const editorData = document.querySelector('#noiDungLyThuyet').value; // Lấy dữ liệu từ CKEditor
+            // Đảm bảo dữ liệu từ CKEditor được thiết lập vào textarea
+            if (editorData.trim() === '') {
+                alert('Nội dung lý thuyết không được để trống.');
+                return false; // Ngăn chặn gửi biểu mẫu
+            }
         });
     </script>
 </body>

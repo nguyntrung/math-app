@@ -132,6 +132,10 @@ $baiHocList = $stmt->fetchAll();
                                 <?php endif; ?>
                                 <form method="POST">
                                     <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                                            <label class="form-check-label" for="flexSwitchCheckDefault">Nhập từ excel</label>
+                                        </div>
                                         <label for="maBaiHoc" class="form-label">Bài học</label>
                                         <select class="form-select" id="maBaiHoc" name="maBaiHoc" required>
                                             <?php foreach ($baiHocList as $baiHoc): ?>
