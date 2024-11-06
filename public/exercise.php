@@ -128,7 +128,7 @@ sort($sortedNumbers);
                     <p id="notification" class="notification text-center" style="color: #ff6347; font-weight: bold;"></p>
                     
                     <?php if ($exerciseType == 0): // Bài tập phép toán ?>
-                        <h5 style="color: #4a90e2;">Hãy kéo 2 số vào ô trống sao cho tổng bằng <?php echo htmlspecialchars($baitap['KetQua']); ?>!</h5>
+                        <h5 style="color: #4a90e2;">Hãy kéo 2 số vào ô trống sao cho kết quả bằng <?php echo htmlspecialchars($baitap['KetQua']); ?>!</h5>
                         <div class="math-problem d-flex justify-content-center align-items-center my-4" style="font-size: 2rem;">
                             <div class="dropzone mx-2" style="width: 60px; height: 60px; border: 3px dashed #ffd700; border-radius: 10px;"></div>
                             <span class="mx-2"><?php echo htmlspecialchars($baitap['PhepToan']); ?></span>
@@ -304,8 +304,8 @@ sort($sortedNumbers);
 
                 if (exerciseType === 0) { // Math exercise
                     if (filledDropzones.length === 2) {
-                        const num1 = parseInt(filledDropzones[0].textContent);
-                        const num2 = parseInt(filledDropzones[1].textContent);
+                        const num1 = parseFloat(filledDropzones[0].textContent);
+                        const num2 = parseFloat(filledDropzones[1].textContent);
                         const targetResult = <?php echo $baitap['KetQua']; ?>;
                         const operator = '<?php echo $baitap['PhepToan']; ?>';
 
