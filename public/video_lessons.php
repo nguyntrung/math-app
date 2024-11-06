@@ -9,8 +9,26 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 include '../database/db.php';
 
 try {
+    // Kiểm tra trạng thái đăng ký thành viên
+    $isActiveMember = false;
     $stmt = $conn->prepare("
-        SELECT ChuongHoc.MaChuong, ChuongHoc.TenChuong, BaiHoc.MaBaiHoc, BaiHoc.TenBai 
+        SELECT COUNT(*) as active_count 
+        FROM dangkythanhvien 
+        WHERE MaNguoiDung = :maNguoiDung 
+        AND TrangThai = 'DANG_HOAT_DONG' 
+        AND NgayKetThuc >= CURRENT_DATE()
+    ");
+    $stmt->bindParam(':maNguoiDung', $_SESSION['MaNguoiDung']);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($result['active_count'] > 0) {
+        $isActiveMember = true;
+    }
+
+    // Lấy danh sách chương và bài học
+    $stmt = $conn->prepare("
+        SELECT ChuongHoc.MaChuong, ChuongHoc.TenChuong, ChuongHoc.MienPhi,
+               BaiHoc.MaBaiHoc, BaiHoc.TenBai 
         FROM ChuongHoc
         LEFT JOIN BaiHoc ON ChuongHoc.MaChuong = BaiHoc.MaChuong
         ORDER BY ChuongHoc.ThuTu ASC, BaiHoc.ThuTu ASC
@@ -24,10 +42,12 @@ try {
         $tenChuong = $row['TenChuong'];
         $maBaiHoc = $row['MaBaiHoc'];
         $tenBaiHoc = $row['TenBai'];
+        $mienPhi = $row['MienPhi'];
 
         if (!isset($chuongData[$maChuong])) {
             $chuongData[$maChuong] = [
                 'tenChuong' => $tenChuong,
+                'mienPhi' => $mienPhi,
                 'baiHocList' => []
             ];
         }
@@ -82,6 +102,7 @@ try {
             margin-bottom: 2rem;
             overflow: hidden;
             transition: transform 0.3s ease;
+            position: relative;
         }
 
         .chapter-card:hover {
@@ -104,6 +125,7 @@ try {
             background: #f8f9fa;
             transition: all 0.3s ease;
             padding: 12px;
+            position: relative;
         }
 
         .lesson-item:hover {
@@ -126,13 +148,62 @@ try {
         .lesson-icon {
             width: 150px;
             margin-right: 15px;
-            border-radius: 10px
-            /* animation: wiggle 2s infinite; */
+            border-radius: 10px;
         }
 
-        @keyframes wiggle {
-            0%, 100% { transform: rotate(-5deg); }
-            50% { transform: rotate(5deg); }
+        .premium-badge {
+            background: #ffd700;
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .locked-content {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .upgrade-message {
+            position: relative;
+            padding: 1rem;
+            background: rgba(255, 243, 205, 0.95);
+            border-radius: 10px;
+            margin: 1rem 0;
+            text-align: center;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .upgrade-button {
+            display: inline-block;
+            background: #ff6b6b;
+            color: white !important;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            pointer-events: auto !important;
+        }
+
+        .upgrade-button:hover {
+            background: #ff8787;
+            transform: scale(1.05);
+            color: white !important;
+            text-decoration: none;
+        }
+
+        .locked-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.7);
+            z-index: 5;
         }
 
         .back-to-top {
@@ -186,16 +257,37 @@ try {
                         <div class="chapter-header">
                             <i class="fas fa-star mr-2"></i>
                             <?= htmlspecialchars($chuong['tenChuong']); ?>
+                            <?php if ($chuong['mienPhi'] == 1): ?>
+                                <span class="premium-badge">
+                                    <i class="fas fa-crown mr-1"></i>Premium
+                                </span>
+                            <?php endif; ?>
                         </div>
                         <div class="p-3">
+                            <?php if ($chuong['mienPhi'] == 1 && !$isActiveMember): ?>
+                                <div class="upgrade-message">
+                                    <i class="fas fa-lock mr-2"></i>
+                                    Nội dung này chỉ dành cho thành viên Premium
+                                    <br>
+                                    <a href="registermember.php" class="upgrade-button">
+                                        <i class="fas fa-crown mr-1"></i>
+                                        Nâng cấp ngay
+                                    </a>
+                                </div>
+                            <?php endif; ?>
+
                             <?php if (!empty($chuong['baiHocList'])): ?>
                                 <?php foreach ($chuong['baiHocList'] as $baiHoc): ?>
                                     <div class="lesson-item">
-                                        <a href="video_lessons_detail.php?maBaiHoc=<?= htmlspecialchars($baiHoc['maBaiHoc']); ?>" 
-                                           class="lesson-link">
+                                        <?php
+                                        $lessonUrl = ($chuong['mienPhi'] == 0 || $isActiveMember) 
+                                            ? "video_lessons_detail.php?maBaiHoc=" . htmlspecialchars($baiHoc['maBaiHoc'])
+                                            : "registermember.php";
+                                        ?>
+                                        <a href="<?= $lessonUrl ?>" class="lesson-link">
                                             <img src="../assets/img/learning.png" 
-                                                 alt="Bài học" 
-                                                 class="lesson-icon">
+                                                alt="Bài học" 
+                                                class="lesson-icon">
                                             <span><?= htmlspecialchars($baiHoc['tenBaiHoc']); ?></span>
                                         </a>
                                     </div>
