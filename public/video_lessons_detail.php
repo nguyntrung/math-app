@@ -15,10 +15,11 @@ if (!isset($_GET['maBaiHoc'])) {
 }
 
 $maBaiHoc = $_GET['maBaiHoc'];
+$maNguoiDung = $_SESSION['MaNguoiDung'];
 
 try {
     // Lấy thông tin video và tên bài học
-    $stmt = $conn->prepare("SELECT TenBai, DuongDanVideo FROM BaiHoc WHERE MaBaiHoc = :maBaiHoc");
+    $stmt = $conn->prepare("SELECT TenBai, DuongDanVideo, ThoiLuongVideo FROM BaiHoc WHERE MaBaiHoc = :maBaiHoc");
     $stmt->bindParam(':maBaiHoc', $maBaiHoc, PDO::PARAM_INT);
     $stmt->execute();
     $lesson = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -30,12 +31,43 @@ try {
 
     $tenBaiHoc = $lesson['TenBai'] ?? "Bài học không có tên";
     $duongDanVideo = $lesson['DuongDanVideo'] ?? null;
+    $videoDuration = $lesson['ThoiLuongVideo'] ?? 0; 
+
+    // Lấy tiến độ học tập của người dùng
+    $stmtProgress = $conn->prepare("SELECT ThoiLuongXem FROM TienDoHocTap WHERE MaNguoiDung = :maNguoiDung AND MaBaiHoc = :maBaiHoc");
+    $stmtProgress->bindParam(':maNguoiDung', $maNguoiDung, PDO::PARAM_INT);
+    $stmtProgress->bindParam(':maBaiHoc', $maBaiHoc, PDO::PARAM_INT);
+    $stmtProgress->execute();
+    $progress = $stmtProgress->fetch(PDO::FETCH_ASSOC);
+
+    // Tính toán tiến độ học tập
+    if ($progress) {
+        $watchedTime = $progress['ThoiLuongXem']; // Thời gian đã xem
+        $progressPercentage = ($watchedTime / $videoDuration) * 100; // Tính tiến độ học tập
+    } else {
+        $progressPercentage = 0; // Nếu chưa có tiến độ, mặc định là 0%
+    }
 
     // Lấy bài học tiếp theo
     $stmtNext = $conn->prepare("SELECT MaBaiHoc, TenBai FROM BaiHoc WHERE MaBaiHoc > :maBaiHoc ORDER BY MaBaiHoc ASC LIMIT 1");
     $stmtNext->bindParam(':maBaiHoc', $maBaiHoc, PDO::PARAM_INT);
     $stmtNext->execute();
     $nextLesson = $stmtNext->fetch(PDO::FETCH_ASSOC);
+
+    // Kiểm tra xem người dùng đã hoàn thành bài học chưa
+    $stmtCheckCompletion = $conn->prepare("SELECT NgayHoanThanh, ThoiLuongXem FROM TienDoHocTap WHERE MaNguoiDung = :maNguoiDung AND MaBaiHoc = :maBaiHoc");
+    $stmtCheckCompletion->bindParam(':maNguoiDung', $maNguoiDung, PDO::PARAM_INT);
+    $stmtCheckCompletion->bindParam(':maBaiHoc', $maBaiHoc, PDO::PARAM_INT);
+    $stmtCheckCompletion->execute();
+    $completion = $stmtCheckCompletion->fetch(PDO::FETCH_ASSOC);
+
+    // Cập nhật trạng thái hoàn thành nếu người dùng chưa hoàn thành
+    if ($completion && !$completion['NgayHoanThanh']) {
+        $stmtUpdateCompletion = $conn->prepare("UPDATE TienDoHocTap SET NgayHoanThanh = NOW() WHERE MaNguoiDung = :maNguoiDung AND MaBaiHoc = :maBaiHoc");
+        $stmtUpdateCompletion->bindParam(':maNguoiDung', $maNguoiDung, PDO::PARAM_INT);
+        $stmtUpdateCompletion->bindParam(':maBaiHoc', $maBaiHoc, PDO::PARAM_INT);
+        $stmtUpdateCompletion->execute();
+    }
 
 } catch (PDOException $e) {
     echo "Lỗi: " . $e->getMessage();
@@ -45,48 +77,57 @@ try {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chi tiết bài giảng</title>
     <?php include '../includes/styles.php'; ?>
     <style>
-        body {
-            background-color: #e9f5ff;
-        }
-        h4 {
-            color: #ff6347;
-            text-shadow: 1px 1px 2px #fff;
-        }
-        .video-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .related-links {
-            margin-top: 20px;
-        }
-        .related-links a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .related-links a:hover {
-            color: #ff6347;
-        }
-        .next-lesson {
-            margin-top: 30px;
-            font-weight: bold;
-        }
-        .back-to-top {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            font-size: 24px;
-        }
+    body {
+        background-color: #e9f5ff;
+    }
+
+    h4 {
+        color: #ff6347;
+        text-shadow: 1px 1px 2px #fff;
+    }
+
+    .video-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .related-links {
+        margin-top: 20px;
+    }
+
+    .related-links a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .related-links a:hover {
+        color: #ff6347;
+    }
+
+    .next-lesson {
+        margin-top: 30px;
+        font-weight: bold;
+    }
+
+    .back-to-top {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        font-size: 24px;
+    }
     </style>
 </head>
+
 <body>
     <?php include '../includes/navbar.php'; ?>
 
@@ -98,12 +139,12 @@ try {
             <!-- Video bài giảng -->
             <div class="video-container">
                 <?php if ($duongDanVideo): ?>
-                    <video controls class="w-100 mb-3">
-                        <source src="<?= htmlspecialchars($duongDanVideo); ?>" type="video/mp4">
-                        Trình duyệt của bạn không hỗ trợ video.
-                    </video>
+                <video controls class="w-100 mb-3">
+                    <source src="<?= htmlspecialchars($duongDanVideo); ?>" type="video/mp4">
+                    Trình duyệt của bạn không hỗ trợ video.
+                </video>
                 <?php else: ?>
-                    <p>Không có video cho bài học này.</p>
+                <p>Không có video cho bài học này.</p>
                 <?php endif; ?>
             </div>
 
@@ -112,19 +153,21 @@ try {
                 <strong>Bài học liên quan:</strong>
                 <ul class="list-unstyled">
                     <li>- <a href="theory_lessons.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Lý thuyết</a></li>
-                    <li>- <a href="essay_detail.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Bài tập tự luận</a></li>
-                    <li>- <a href="quiz_detail.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Bài tập trắc nghiệm</a></li>
+                    <li>- <a href="essay_detail.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Bài tập tự luận</a>
+                    </li>
+                    <li>- <a href="quiz_detail.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Bài tập trắc nghiệm</a>
+                    </li>
                 </ul>
             </div>
 
             <!-- Liên kết đến bài học tiếp theo -->
             <?php if ($nextLesson): ?>
-                <div class="next-lesson">
-                    <strong>Bài học tiếp theo:</strong><br>
-                    <a href="video_lessons_detail.php?maBaiHoc=<?= htmlspecialchars($nextLesson['MaBaiHoc']); ?>">
-                        <?= htmlspecialchars($nextLesson['TenBai']); ?>
-                    </a>
-                </div>
+            <div class="next-lesson">
+                <strong>Bài học tiếp theo:</strong><br>
+                <a href="video_lessons_detail.php?maBaiHoc=<?= htmlspecialchars($nextLesson['MaBaiHoc']); ?>">
+                    <?= htmlspecialchars($nextLesson['TenBai']); ?>
+                </a>
+            </div>
             <?php endif; ?>
         </div>
     </div>
@@ -137,5 +180,56 @@ try {
 
     <?php include '../includes/scripts.php'; ?>
     <script src="../assets/js/main.js"></script>
+
+    <!-- Lấy thời gian xem video và cập nhật tiến độ -->
+    <script>
+    const video = document.querySelector('video');
+    const progressBar = document.querySelector('#progress');
+    const progressText = document.querySelector('#progress-text');
+
+    // Đảm bảo video đã tải và có thể lấy thời gian
+    video.addEventListener('loadedmetadata', () => {
+        const videoDuration = video.duration; // Thời gian tổng của video (tính bằng giây)
+
+        // Cập nhật khi video đang phát
+        video.addEventListener('timeupdate', () => {
+            const watchedDuration = video.currentTime; // Thời gian đã xem (tính bằng giây)
+
+            // Tính toán phần trăm đã xem
+            const watchedPercentage = (watchedDuration / videoDuration) * 100;
+
+            // Cập nhật thanh tiến độ
+            progressBar.value = watchedPercentage;
+            progressText.textContent = Math.round(watchedPercentage) + "%";
+        });
+
+        // Gửi tiến độ học tập lên server khi video kết thúc
+        video.addEventListener('ended', () => {
+            const watchedDuration = video
+                .duration; // Nếu video đã xem hết, gán thời gian hoàn thành cho người dùng
+            fetch('save_progress.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        maBaiHoc: <?= json_encode($maBaiHoc); ?>, // Mã bài học từ PHP
+                        watchedDuration: watchedDuration // Gửi thời gian video đã hoàn thành
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        alert("Bạn đã hoàn thành bài học!");
+                    } else {
+                        alert("Có lỗi xảy ra khi lưu tiến độ.");
+                    }
+                })
+                .catch(error => console.error("Lỗi khi lưu tiến độ:", error));
+        });
+    });
+    </script>
+
 </body>
-</html>
+
+</html>     
