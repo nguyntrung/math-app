@@ -11,10 +11,10 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 include '../../../database/db.php';
 
 // Lấy danh sách bài học từ cơ sở dữ liệu
-$stmt = $conn->prepare("SELECT b.MaBaiHoc, b.TenBai, b.NoiDungLyThuyet, b.DuongDanVideo, c.TenChuong 
+$stmt = $conn->prepare("SELECT b.MaBaiHoc, b.TenBai, b.NoiDungLyThuyet, b.DuongDanVideo, b.ThoiLuongVideo, c.TenChuong 
                          FROM baihoc b 
                          JOIN chuonghoc c ON b.MaChuong = c.MaChuong 
-                         ORDER BY b.ThuTu ASC");
+                         ORDER BY b.MaBaiHoc ASC");
 $stmt->execute();
 $baiHocList = $stmt->fetchAll();
 ?>
@@ -75,6 +75,7 @@ $baiHocList = $stmt->fetchAll();
                                                 <th>Tên bài</th>
                                                 <th>Lý thuyết</th>
                                                 <th>Đường dẫn</th>
+                                                <th>Thời Lượng Video</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
@@ -104,6 +105,12 @@ $baiHocList = $stmt->fetchAll();
                                                     <?php 
                                               $duongDanVideo = htmlspecialchars($baiHoc['DuongDanVideo']);
                                               echo mb_substr($duongDanVideo, 0, 20) . (mb_strlen($duongDanVideo) > 20 ? '...' : ''); 
+                                              ?>
+                                                </td>
+                                                <td>
+                                                    <?php 
+                                              $thoiLuongVideo = htmlspecialchars($baiHoc['ThoiLuongVideo']);
+                                              echo mb_substr($thoiLuongVideo, 0, 20) . (mb_strlen($thoiLuongVideo) > 20 ? '...' : ''); 
                                               ?>
                                                 </td>
                                                 <td>
@@ -168,7 +175,7 @@ $baiHocList = $stmt->fetchAll();
 
             // Xử lý khi nhấn nút xóa trong modal
             document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-                window.location.href = 'delete.php?id=' + maBaiHocToDelete + '&table=baihoc&location=lessons_manager.php&idColumn=MaBaiHoc';
+                window.location.href = 'delete.php?id=' + maBaiHocToDelete + '&table=baihoc&location=lessons_manage.php&idColumn=MaBaiHoc';
             });
         </script>
 </body>
