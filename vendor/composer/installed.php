@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'b0cb132064b142aac61176743ecaf4a3df2cea9d',
+        'reference' => 'faeb4a32e0db6f9d9c9ee93aafd3affd15d32850',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'b0cb132064b142aac61176743ecaf4a3df2cea9d',
+            'reference' => 'faeb4a32e0db6f9d9c9ee93aafd3affd15d32850',
             'dev_requirement' => false,
         ),
         'maennchen/zipstream-php' => array(
