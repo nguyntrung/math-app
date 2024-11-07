@@ -1,3 +1,29 @@
+<?php
+// Kiểm tra người dùng có đăng ký VIP đang hoạt động không
+$hasActiveVIP = false;
+$vipType = null;
+if (isset($_SESSION['MaNguoiDung'])) {
+    try {
+        $stmt = $conn->prepare("SELECT LoaiDangKy 
+                               FROM dangkythanhvien 
+                               WHERE MaNguoiDung = :userID 
+                               AND TrangThai = 'DANG_HOAT_DONG' 
+                               AND NgayKetThuc >= CURDATE()
+                               ORDER BY NgayKetThuc DESC 
+                               LIMIT 1");
+        $stmt->execute(['userID' => $_SESSION['MaNguoiDung']]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($result) {
+            $hasActiveVIP = true;
+            $vipType = $result['LoaiDangKy'];
+        }
+    } catch (PDOException $e) {
+        error_log("Error checking VIP status: " . $e->getMessage());
+    }
+}
+?>
+
 <!-- Navbar Start -->
 <div class="container-fluid position-relative shadow" style="background: linear-gradient(135deg, #e0f7ff 0%, #fff0f9 100%);">
     <nav class="navbar navbar-expand-lg navbar-light py-3 py-lg-0 px-0 px-lg-5">
@@ -41,7 +67,71 @@
             <?php if (isset($_SESSION['HoTen'])): ?>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle rounded-circle text-primary p-2" data-toggle="dropdown">
-                        <i class="fas fa-user"></i>
+                        <div class="position-relative d-inline-block">
+                            <img src="../assets/img/2.png" alt="Avatar" class="h-auto rounded-circle" style="width: 35px; border: 2px solid #fff;" />
+                            <?php if ($hasActiveVIP): ?>
+                            <div class="position-absolute" style="top: -5px; right: -5px; width: 45px; height: 45px; pointer-events: none;">
+                                <!-- Hiệu ứng lấp lánh -->
+                                <div class="position-absolute w-100 h-100 animate-sparkle" style="background: radial-gradient(circle at center, rgba(255,215,0,0.2) 0%, transparent 70%);"></div>
+                                
+                                <!-- SVG Border với animation -->
+                                <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;">
+                                    <defs>
+                                        <linearGradient id="vipBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#FFD700">
+                                                <animate attributeName="stop-color" 
+                                                        values="#FFD700;#FFA500;#FFD700" 
+                                                        dur="2s" 
+                                                        repeatCount="indefinite" />
+                                            </stop>
+                                            <stop offset="100%" style="stop-color:#FFA500">
+                                                <animate attributeName="stop-color" 
+                                                        values="#FFA500;#FFD700;#FFA500" 
+                                                        dur="2s" 
+                                                        repeatCount="indefinite" />
+                                            </stop>
+                                        </linearGradient>
+                                    </defs>
+                                    <circle cx="50" cy="50" r="48" fill="none" stroke="url(#vipBorder)" stroke-width="4">
+                                        <animate attributeName="stroke-dasharray" 
+                                                values="0 300;300 0" 
+                                                dur="8s" 
+                                                repeatCount="indefinite" />
+                                    </circle>
+                                    <circle cx="50" cy="50" r="46" fill="none" stroke="#fff" stroke-width="2" opacity="0.5" />
+                                </svg>
+                                
+                                <!-- VIP Badge -->
+                                <div class="position-absolute" style="top: -8px; right: -8px;">
+                                    <?php if ($vipType == 'NAM'): ?>
+                                    <span class="d-flex align-items-center justify-content-center" 
+                                        style="background: linear-gradient(45deg, #FFD700, #FFA500); 
+                                                border-radius: 12px;
+                                                padding: 2px 6px;
+                                                font-size: 10px;
+                                                color: white;
+                                                font-weight: bold;
+                                                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                                                text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
+                                        VIP PRO
+                                    </span>
+                                    <?php else: ?>
+                                    <span class="d-flex align-items-center justify-content-center" 
+                                        style="background: linear-gradient(45deg, #FFD700, #FFA500);
+                                                border-radius: 50%;
+                                                padding: 2px 4px;
+                                                font-size: 10px;
+                                                color: white;
+                                                font-weight: bold;
+                                                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                                                text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
+                                        <i class="fa-solid fa-crown"></i>
+                                    </span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                        </div>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right rounded-lg border-0 shadow-lg">
                         <span class="dropdown-item disabled font-weight-bold">
@@ -64,6 +154,43 @@
 <!-- Navbar End -->
 
 <style>
+    /* Thêm vào phần CSS của bạn */
+    @keyframes sparkle {
+        0% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+        50% {
+            transform: scale(1.2);
+            opacity: 0.8;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+    }
+
+    .animate-sparkle {
+        animation: sparkle 2s infinite;
+        border-radius: 50%;
+    }
+
+    /* Thêm hiệu ứng hover cho avatar */
+    .nav-link:hover .position-relative img {
+        transform: scale(1.1);
+        transition: transform 0.3s ease;
+    }
+
+    /* Thêm box-shadow cho badge */
+    .nav-link .position-absolute span {
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover .position-absolute span {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
     .hover-scale {
         transition: transform 0.2s ease;
     }
