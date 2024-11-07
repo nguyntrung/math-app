@@ -57,9 +57,9 @@ try {
         $stmtInsert->execute();
     }
 
-    // Kiểm tra nếu người dùng đã xem đủ video (ví dụ: xem 95% thời gian video trở lên)
+    // Kiểm tra nếu người dùng đã xem đủ video 
     if ($watchedDuration >= $videoDuration * 1) {
-        // Cập nhật ngày hoàn thành (Nếu người dùng đã xem 95% video trở lên)
+        // Cập nhật ngày hoàn thành 
         $stmtUpdateCompletion = $conn->prepare("UPDATE TienDoHocTap SET NgayHoanThanh = NOW() WHERE MaNguoiDung = :maNguoiDung AND MaBaiHoc = :maBaiHoc");
         $stmtUpdateCompletion->bindParam(':maNguoiDung', $maNguoiDung, PDO::PARAM_INT);
         $stmtUpdateCompletion->bindParam(':maBaiHoc', $maBaiHoc, PDO::PARAM_INT);
