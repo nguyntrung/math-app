@@ -37,6 +37,8 @@ try {
     $chuongBaiHocList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $chuongData = [];
+    $totalLessons = 0; // Tổng số bài học
+
     foreach ($chuongBaiHocList as $row) {
         $maChuong = $row['MaChuong'];
         $tenChuong = $row['TenChuong'];
@@ -59,16 +61,15 @@ try {
                 'tenBaiHoc' => $tenBaiHoc,
                 'thoiLuongVideo' => $thoiLuongVideo 
             ];
+            $totalLessons++; // Tăng tổng số bài học
         }
     }
 
-    $totalVideos = 0;
-    $completedVideos = 0;
+    $completedLessons = 0;
 
-    // Duyệt qua các bài học
+    // Đếm số bài học đã hoàn thành
     foreach ($chuongBaiHocList as $row) {
-        $totalVideos++;
-        $queryProgress = "SELECT * FROM tiendohoctap WHERE MaNguoiDung = :maNguoiDung AND MaBaiHoc = :maBaiHoc";
+        $queryProgress = "SELECT ThoiLuongXem FROM tiendohoctap WHERE MaNguoiDung = :maNguoiDung AND MaBaiHoc = :maBaiHoc";
         $stmtProgress = $conn->prepare($queryProgress);
         $stmtProgress->bindParam(':maNguoiDung', $_SESSION['MaNguoiDung']);
         $stmtProgress->bindParam(':maBaiHoc', $row['MaBaiHoc']);
@@ -76,26 +77,18 @@ try {
         
         $progress = $stmtProgress->fetch(PDO::FETCH_ASSOC);
 
-        if ($progress) {
-            // Kiểm tra xem video đã xem hết chưa
-            if ($progress['ThoiLuongXem'] == $row['ThoiLuongVideo']) {
-                $completedVideos++;
-            }
+        if ($progress && $progress['ThoiLuongXem'] == $row['ThoiLuongVideo']) {
+            $completedLessons++;
         }
     }
 
-    // Tính tiến độ dựa trên số lượng video đã hoàn thành
-    if ($totalVideos > 0) {
-        $progressPercent = ($completedVideos / $totalVideos) * 100;
-    } else {
-        $progressPercent = 0;
-    }
+    // Tính tiến độ dựa trên số lượng bài học đã hoàn thành
+    $progressPercent = ($totalLessons > 0) ? ($completedLessons / $totalLessons) * 100 : 0;
 
-
-    } catch (PDOException $e) {
-        echo "Lỗi: " . $e->getMessage();
-        exit();
-    }
+} catch (PDOException $e) {
+    echo "Lỗi: " . $e->getMessage();
+    exit();
+}
 ?>
 
 
