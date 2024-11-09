@@ -53,7 +53,7 @@ if (isset($_SESSION['MaNguoiDung'])) {
                             <i class="fas fa-book mr-2"></i>Giải bài tập SGK</a>
                         <a href="../public/quiz_check_15.php" class="dropdown-item py-2 px-4 hover-scale">
                             <i class="fas fa-clock mr-2"></i>Kiểm tra 15 phút</a>
-                        <a href="#" class="dropdown-item py-2 px-4 hover-scale">
+                        <a href="../public/quiz_check_45.php" class="dropdown-item py-2 px-4 hover-scale">
                             <i class="fas fa-file-alt mr-2"></i>Kiểm tra 1 tiết</a>
                         <a href="../public/exercise.php" class="dropdown-item py-2 px-4 hover-scale">
                             <i class="fas fa-redo mr-2"></i>Ôn tập</a>
