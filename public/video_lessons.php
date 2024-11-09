@@ -372,13 +372,11 @@ try {
             <?php endif; ?>
 
             <!-- Hiển thị vòng tròn tiến độ -->
-            <div class="progress-circle-container">
-                <div class="progress-circle"
-                    style="background: conic-gradient(#ff6b6b <?= $progressPercent; ?>%, #e0e0e0 <?= $progressPercent; ?>% 100%);">
-                    <span class="progress-text"><?= round($progressPercent); ?>%</span>
+            <div class="progress" role="progressbar" aria-label="Progress" aria-valuenow="<?= round($progressPercent); ?>" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar bg-warning text-dark" style="width: <?= $progressPercent; ?>%;">
+                    <?= round($progressPercent); ?>%
                 </div>
             </div>
-
 
         </div>
     </div>

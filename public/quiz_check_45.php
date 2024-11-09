@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Nếu cần thiết, lấy 10 câu hỏi ngẫu nhiên từ cơ sở dữ liệu
 if ($showQuiz) {
-    $stmt = $conn->prepare("SELECT * FROM cauhoitracnghiem ORDER BY RAND() LIMIT 10");
+    $stmt = $conn->prepare("SELECT * FROM cauhoitracnghiem ORDER BY RAND() LIMIT 40");
     $stmt->execute();
     $cauHoiList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -53,7 +53,7 @@ if ($showQuiz) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Kiểm tra 15 phút</title>
+    <title>Kiểm tra 45 phút</title>
 
     <?php include '../includes/styles.php'; ?>
     <style>
@@ -89,7 +89,7 @@ if ($showQuiz) {
     
     <div class="container pt-5">
         <div class="pb-5">
-            <h4 class="text-center mb-4" style="color: #ff6347;">Kiểm tra 15 phút</h4>
+            <h4 class="text-center mb-4" style="color: #ff6347;">Kiểm tra 45 phút</h4>
             
             <?php if ($showQuiz): ?>
                 <form method="POST" action="">
@@ -110,7 +110,7 @@ if ($showQuiz) {
             <?php else: ?>
                 <div class="result">
                     <h4 style="color: #ff6347;">Kết quả kiểm tra</h4>
-                    <p>Bạn đã trả lời đúng <?= $diem; ?>/10 câu hỏi.</p>
+                    <p>Bạn đã trả lời đúng <?= $diem; ?>/40 câu hỏi.</p>
                     <a href="theory_lessons.php" class="btn btn-primary">Trở về bài học</a>
                 </div>
             <?php endif; ?>
@@ -124,5 +124,8 @@ if ($showQuiz) {
 
     <?php include '../includes/scripts.php'; ?>
     <script src="../assets/js/main.js"></script>
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
 </body>
 </html>
