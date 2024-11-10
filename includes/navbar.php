@@ -59,7 +59,7 @@ if (isset($_SESSION['MaNguoiDung'])) {
                             <i class="fas fa-redo mr-2"></i>Ôn tập</a>
                     </div>
                 </div>
-                <a href="contact.html" class="nav-item nav-link rounded-pill px-4 mx-1 hover-scale">
+                <a href="contact.php" class="nav-item nav-link rounded-pill px-4 mx-1 hover-scale">
                     <i class="fas fa-phone mr-2"></i>Liên hệ</a>
                 <a href="about.php" class="nav-item nav-link rounded-pill px-4 mx-1 hover-scale">
                     <i class="fas fa-users mr-2"></i>Về chúng tôi</a>
