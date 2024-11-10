@@ -84,47 +84,156 @@ try {
     <title>Chi tiết bài giảng</title>
     <?php include '../includes/styles.php'; ?>
     <style>
-    body {
-        background-color: #e9f5ff;
-    }
+        body {
+        background-color: #f0f9ff;
+        }
 
-    h4 {
-        color: #ff6347;
-        text-shadow: 1px 1px 2px #fff;
-    }
+        h4 {
+            color: #4a90e2;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 24px;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #fff6e5, #ffe5e5);
+            text-align: center;
+        }
 
-    .video-container {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-    }
+        .video-container {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            border: 3px solid #ffd700;
+        }
 
-    .related-links {
-        margin-top: 20px;
-    }
+        .related-links {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 25px;
+            border: 2px dashed #4a90e2;
+        }
 
-    .related-links a {
-        color: #007bff;
-        text-decoration: none;
-    }
+        .related-links strong {
+            color: #ff6b6b;
+            font-size: 20px;
+            display: block;
+            margin-bottom: 15px;
+        }
 
-    .related-links a:hover {
-        color: #ff6347;
-    }
+        .related-links ul li {
+            margin: 15px 0;
+            padding-left: 25px;
+            position: relative;
+        }
 
-    .next-lesson {
-        margin-top: 30px;
-        font-weight: bold;
-    }
+        .related-links ul li:before {
+            content: "🌟";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
 
-    .back-to-top {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        font-size: 24px;
-    }
+        .related-links a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+
+        .related-links a:hover {
+            color: #ff6b6b;
+            background-color: #fff6e5;
+            transform: scale(1.05);
+        }
+
+        .next-lesson {
+            background-color: #e5f5ff;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
+            border: 3px solid #4a90e2;
+        }
+
+        .next-lesson strong {
+            color: #4a90e2;
+            font-size: 20px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .next-lesson a {
+            display: inline-block;
+            color: #fff;
+            background-color: #4a90e2;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .next-lesson a:hover {
+            background-color: #ff6b6b;
+            transform: scale(1.05);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .back-to-top:hover {
+            background-color: #4a90e2;
+            transform: translateY(-5px);
+        }
+
+        video {
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #progress {
+            height: 20px;
+            border-radius: 10px;
+            background-color: #e5f5ff;
+            border: 2px solid #4a90e2;
+        }
+
+        #progress::-webkit-progress-bar {
+            background-color: #e5f5ff;
+            border-radius: 10px;
+        }
+
+        #progress::-webkit-progress-value {
+            background-color: #4a90e2;
+            border-radius: 8px;
+        }
+
+        #progress-text {
+            color: #4a90e2;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
     </style>
 </head>
 
@@ -152,11 +261,9 @@ try {
             <div class="related-links">
                 <strong>Bài học liên quan:</strong>
                 <ul class="list-unstyled">
-                    <li>- <a href="theory_lessons.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Lý thuyết</a></li>
-                    <li>- <a href="essay_detail.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Bài tập tự luận</a>
-                    </li>
-                    <li>- <a href="quiz_detail.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Bài tập trắc nghiệm</a>
-                    </li>
+                    <li><a href="theory_lessons.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Lý thuyết</a></li>
+                    <li><a href="essay_detail.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Bài tập tự luận</a></li>
+                    <li><a href="quiz_detail.php?maBaiHoc=<?= htmlspecialchars($maBaiHoc); ?>">Bài tập trắc nghiệm</a></li>
                 </ul>
             </div>
 
