@@ -8,9 +8,15 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 
 include '../database/db.php';
 
+if (!isset($_SESSION['startTime'])) {
+    $_SESSION['startTime'] = time();
+}
+
 // Khởi tạo biến để kiểm tra xem có cần hiển thị câu hỏi hay không
 $showQuiz = true;
 $diem = 0;
+$loaiKiemTra = '15p'; // Đặt loại kiểm tra là 15 phút
+$ngayThi = date('Y-m-d H:i:s'); // Lưu ngày và giờ thi
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Kiểm tra xem có dữ liệu từ biểu mẫu không
@@ -29,6 +35,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $diem++;
             }
         }
+
+        // Nhận thời gian bắt đầu (giả sử đây là thời điểm gửi form)
+        $startTime = $_SESSION['startTime']; // Thời gian bắt đầu
+        $endTime = $ngayThi; // Thời gian kết thúc (ngayThi)
+        $thoiGianThi = strtotime($endTime) - strtotime($startTime); // Tính thời gian thi (giây)
+    
+            // Lưu kết quả vào bảng ketquakiemtra
+            $stmtInsert = $conn->prepare("INSERT INTO ketquakiemtra (MaNguoiDung, Diem, LoaiKiemTra, ThoiGianThi, NgayThi) 
+                                                    VALUES (?, ?, ?, ?, ?)");
+            $stmtInsert->execute([$_SESSION['MaNguoiDung'], $diem, $loaiKiemTra, $thoiGianThi, $ngayThi]);
 
         // Đặt biến để không hiển thị câu hỏi nữa
         $showQuiz = false;
@@ -49,6 +65,7 @@ if ($showQuiz) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -57,64 +74,75 @@ if ($showQuiz) {
 
     <?php include '../includes/styles.php'; ?>
     <style>
-        body {
-            background-color: #e9f5ff;
-        }
-        .result {
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        .question {
-            margin-bottom: 20px;
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
-        }
-        .btn-success {
+    body {
+        background-color: #e9f5ff;
+    }
+
+    .result {
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .question {
+        margin-bottom: 20px;
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+    }
+
+    .btn-success {
         background-color: #ff6347;
         border-color: #ff6347;
-        }
-        .btn-success:hover {
-            background-color: #ff8560;
-            border-color: #ff8560;
-        }
+    }
+
+    .btn-success:hover {
+        background-color: #ff8560;
+        border-color: #ff8560;
+    }
     </style>
 
 </head>
+
 <body>
     <?php include '../includes/navbar.php'; ?>
-    
+
     <div class="container pt-5">
         <div class="pb-5">
             <h4 class="text-center mb-4" style="color: #ff6347;">Kiểm tra 15 phút</h4>
-            
-            <?php if ($showQuiz): ?>
-                <form method="POST" action="">
-                    <?php foreach ($cauHoiList as $index => $cauHoi): ?>
-                        <div class="question">
-                            <p class="font-weight-bold"><?= ($index + 1) . '. ' . htmlspecialchars($cauHoi['NoiDung']); ?></p>
-                            <div>
-                                <label><input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="A" class="mr-2"> A: <?= htmlspecialchars($cauHoi['DapAnA']); ?></label><br>
-                                <label><input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="B" class="mr-2"> B: <?= htmlspecialchars($cauHoi['DapAnB']); ?></label><br>
-                                <label><input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="C" class="mr-2"> C: <?= htmlspecialchars($cauHoi['DapAnC']); ?></label><br>
-                                <label><input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="D" class="mr-2"> D: <?= htmlspecialchars($cauHoi['DapAnD']); ?></label><br>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
 
-                    <button type="submit" class="btn btn-success btn-lg btn-block mt-4">Nộp bài</button>
-                </form>
-            <?php else: ?>
-                <div class="result">
-                    <h4 style="color: #ff6347;">Kết quả kiểm tra</h4>
-                    <p>Bạn đã trả lời đúng <?= $diem; ?>/10 câu hỏi.</p>
-                    <a href="theory_lessons.php" class="btn btn-primary">Trở về bài học</a>
+            <?php if ($showQuiz): ?>
+            <form method="POST" action="">
+                <?php foreach ($cauHoiList as $index => $cauHoi): ?>
+                <div class="question">
+                    <p class="font-weight-bold"><?= ($index + 1) . '. ' . htmlspecialchars($cauHoi['NoiDung']); ?></p>
+                    <div>
+                        <label><input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="A" class="mr-2"> A:
+                            <?= htmlspecialchars($cauHoi['DapAnA']); ?></label><br>
+                        <label><input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="B" class="mr-2"> B:
+                            <?= htmlspecialchars($cauHoi['DapAnB']); ?></label><br>
+                        <label><input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="C" class="mr-2"> C:
+                            <?= htmlspecialchars($cauHoi['DapAnC']); ?></label><br>
+                        <label><input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="D" class="mr-2"> D:
+                            <?= htmlspecialchars($cauHoi['DapAnD']); ?></label><br>
+                    </div>
                 </div>
+                <?php endforeach; ?>
+
+                <button type="submit" class="btn btn-success btn-lg btn-block mt-4">Nộp bài</button>
+            </form>
+            <?php else: ?>
+            <div class="result">
+                <h4 style="color: #ff6347;">Kết quả kiểm tra</h4>
+                <p>Bạn đã trả lời đúng <?= $diem; ?>/10 câu hỏi.</p>
+                <a href="theory_lessons.php" class="btn btn-primary">Trở về bài học</a>
+            </div>
             <?php endif; ?>
         </div>
+
+
     </div>
 
     <?php include '../includes/footer.php'; ?>
@@ -125,4 +153,5 @@ if ($showQuiz) {
     <?php include '../includes/scripts.php'; ?>
     <script src="../assets/js/main.js"></script>
 </body>
+
 </html>
