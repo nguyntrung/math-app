@@ -68,7 +68,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
                     </div>
                     <button type="submit" name="login" class="btn btn-primary">Đăng Nhập</button>
                 </form>
-                <p class="mt-3">Chưa có tài khoản? <a href="register.php">Đăng ký ngay</a></p>
+                <p class="mt-3">
+                    Chưa có tài khoản? <a href="register.php">Đăng ký ngay</a> | 
+                    <a href="forgot-password.php">Quên mật khẩu?</a>
+                </p>
             </div>
         </div>
     </div>
