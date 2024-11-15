@@ -2,7 +2,7 @@
 <div class="container-fluid bg-light text-dark py-5 px-sm-3 px-md-5">
     <div class="row pt-5">
         <!-- Logo Section -->
-        <div class="col-lg-3 col-md-6 mb-5">
+        <div class="col-lg-4 col-md-6 mb-5">
             <a href="" class="navbar-brand font-weight-bold text-primary m-0 mb-4 p-0" style="font-size: 40px; line-height: 40px;">
                 <i class="flaticon-043-teddy-bear"></i>
                 <span class="text-dark">ToanLop5.vn</span>
@@ -17,7 +17,7 @@
         </div>
 
         <!-- Contact Information Section -->
-        <div class="col-lg-3 col-md-6 mb-5">
+        <div class="col-lg-4 col-md-6 mb-5">
             <h3 class="text-info mb-4">Liên hệ</h3>
             <div class="d-flex">
                 <h4 class="fa fa-map-marker-alt text-info"></h4>
@@ -43,7 +43,7 @@
         </div>
 
         <!-- Quick Links Section -->
-        <div class="col-lg-3 col-md-6 mb-5">
+        <div class="col-lg-4 col-md-6 mb-5">
             <h3 class="text-info mb-4">Liên kết nhanh</h3>
             <div class="d-flex flex-column justify-content-start">
                 <a class="text-dark mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Trang chủ</a>
@@ -51,23 +51,6 @@
                 <a class="text-dark mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Khóa học</a>
                 <a class="text-dark" href="#"><i class="fa fa-angle-right mr-2"></i>Liên hệ với chúng tôi</a>
             </div>
-        </div>
-
-        <!-- Feedback Section -->
-        <div class="col-lg-3 col-md-6 mb-5">
-            <h3 class="text-info mb-4">Phản hồi</h3>
-            <!-- Feedback form -->
-            <form action="" method="POST">
-                <div class="form-group">
-                    <input type="text" class="form-control border-0 py-3" name="ten" placeholder="Nhập tên" required="required" />
-                </div>
-                <div class="form-group">
-                    <textarea class="form-control border-0 py-3" name="noidung" placeholder="Nội dung" required="required"></textarea>
-                </div>
-                <div>
-                    <button class="btn btn-info btn-block border-0 py-3" type="submit">Gửi</button>
-                </div>
-            </form>
         </div>
     </div>
 

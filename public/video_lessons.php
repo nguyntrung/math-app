@@ -25,72 +25,36 @@ try {
         $isActiveMember = true;
     }
 
-    // Lấy danh sách chương và bài học, kèm theo ThoiLuongVideo từ BaiHoc
+    // Lấy danh sách chương học
     $stmt = $conn->prepare("
-        SELECT ChuongHoc.MaChuong, ChuongHoc.TenChuong, ChuongHoc.MienPhi,
-               BaiHoc.MaBaiHoc, BaiHoc.TenBai, BaiHoc.ThoiLuongVideo
+        SELECT 
+            ChuongHoc.MaChuong, 
+            ChuongHoc.TenChuong, 
+            ChuongHoc.MienPhi,
+            ChuongHoc.ThuTu,
+            COUNT(BaiHoc.MaBaiHoc) as SoBaiHoc,
+            (
+                SELECT COUNT(*)
+                FROM tiendohoctap t
+                JOIN BaiHoc b ON t.MaBaiHoc = b.MaBaiHoc
+                WHERE b.MaChuong = ChuongHoc.MaChuong
+                AND t.MaNguoiDung = :maNguoiDung
+                AND t.ThoiLuongXem = b.ThoiLuongVideo
+            ) as BaiHocHoanThanh
         FROM ChuongHoc
         LEFT JOIN BaiHoc ON ChuongHoc.MaChuong = BaiHoc.MaChuong
-        ORDER BY ChuongHoc.ThuTu ASC, BaiHoc.ThuTu ASC
+        GROUP BY ChuongHoc.MaChuong
+        ORDER BY ChuongHoc.ThuTu ASC
     ");
+    $stmt->bindParam(':maNguoiDung', $_SESSION['MaNguoiDung']);
     $stmt->execute();
-    $chuongBaiHocList = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    $chuongData = [];
-    $totalLessons = 0; // Tổng số bài học
-
-    foreach ($chuongBaiHocList as $row) {
-        $maChuong = $row['MaChuong'];
-        $tenChuong = $row['TenChuong'];
-        $maBaiHoc = $row['MaBaiHoc'];
-        $tenBaiHoc = $row['TenBai'];
-        $mienPhi = $row['MienPhi'];
-        $thoiLuongVideo = $row['ThoiLuongVideo']; 
-
-        if (!isset($chuongData[$maChuong])) {
-            $chuongData[$maChuong] = [
-                'tenChuong' => $tenChuong,
-                'mienPhi' => $mienPhi,
-                'baiHocList' => []
-            ];
-        }
-
-        if ($maBaiHoc) {
-            $chuongData[$maChuong]['baiHocList'][] = [
-                'maBaiHoc' => $maBaiHoc,
-                'tenBaiHoc' => $tenBaiHoc,
-                'thoiLuongVideo' => $thoiLuongVideo 
-            ];
-            $totalLessons++; // Tăng tổng số bài học
-        }
-    }
-
-    $completedLessons = 0;
-
-    // Đếm số bài học đã hoàn thành
-    foreach ($chuongBaiHocList as $row) {
-        $queryProgress = "SELECT ThoiLuongXem FROM tiendohoctap WHERE MaNguoiDung = :maNguoiDung AND MaBaiHoc = :maBaiHoc";
-        $stmtProgress = $conn->prepare($queryProgress);
-        $stmtProgress->bindParam(':maNguoiDung', $_SESSION['MaNguoiDung']);
-        $stmtProgress->bindParam(':maBaiHoc', $row['MaBaiHoc']);
-        $stmtProgress->execute();
-        
-        $progress = $stmtProgress->fetch(PDO::FETCH_ASSOC);
-
-        if ($progress && $progress['ThoiLuongXem'] == $row['ThoiLuongVideo']) {
-            $completedLessons++;
-        }
-    }
-
-    // Tính tiến độ dựa trên số lượng bài học đã hoàn thành
-    $progressPercent = ($totalLessons > 0) ? ($completedLessons / $totalLessons) * 100 : 0;
+    $chuongData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
     echo "Lỗi: " . $e->getMessage();
     exit();
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -104,205 +68,222 @@ try {
     <?php include '../includes/styles.php'; ?>
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
     <style>
-    body {
-        background: linear-gradient(135deg, #c2e9fb 0%, #a1c4fd 100%);
-    }
-
-    .main-title {
-        color: #ff6b6b;
-        text-align: center;
-        font-size: 2.5rem;
-        margin: 2rem 0;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        animation: bounce 2s infinite;
-    }
-
-    @keyframes bounce {
-
-        0%,
-        100% {
-            transform: translateY(0);
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --background-color: #f5f5f5;
+            --text-color: #333;
         }
 
-        50% {
-            transform: translateY(-10px);
+        body {
+            margin: 0;
+            background-color: var(--background-color);
         }
-    }
 
-    .chapter-card {
-        background: white;
-        border-radius: 20px;
-        border: none;
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
-        overflow: hidden;
-        transition: transform 0.3s ease;
-        position: relative;
-    }
+        .learning-container {
+            display: flex;
+            gap: 20px;
+            padding: 20px 200px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-    .chapter-card:hover {
-        transform: translateY(-5px);
-    }
+        /* Left Sidebar Styles */
+        .chapters-sidebar {
+            flex: 0 0 300px;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
 
-    .chapter-header {
-        background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 100%);
-        color: white;
-        padding: 1rem;
-        border-radius: 20px 20px 0 0;
-        font-size: 1.5rem;
-        text-align: center;
-    }
+        .chapter-search {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            margin-bottom: 15px;
+        }
 
-    .lesson-item {
-        border: none;
-        margin: 10px;
-        border-radius: 15px;
-        background: #f8f9fa;
-        transition: all 0.3s ease;
-        padding: 12px;
-        position: relative;
-    }
+        .chapter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
 
-    .lesson-item:hover {
-        background: #fff3f3;
-        transform: scale(1.02);
-    }
+        .chapter-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: #eee;
+            border-radius: 20px;
+            cursor: pointer;
+        }
 
-    .lesson-link {
-        color: #5b6c8d;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-    }
+        .chapter-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
 
-    .lesson-link:hover {
-        color: #ff6b6b;
-        text-decoration: none;
-    }
+        .chapter-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
 
-    .lesson-icon {
-        width: 150px;
-        margin-right: 15px;
-        border-radius: 10px;
-    }
+        .chapter-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
 
-    .premium-badge {
-        background: #ffd700;
-        color: #000;
-        padding: 5px 10px;
-        border-radius: 15px;
-        font-size: 0.9rem;
-        margin-left: 10px;
-    }
+        .chapter-item:hover {
+            background: #e9ecef;
+        }
 
-    .locked-content {
-        opacity: 0.7;
-        pointer-events: none;
-    }
+        .chapter-item.active {
+            background: #e3f2fd;
+            border-left: 4px solid var(--secondary-color);
+        }
 
-    .upgrade-message {
-        position: relative;
-        padding: 1rem;
-        background: rgba(255, 243, 205, 0.95);
-        border-radius: 10px;
-        margin: 1rem 0;
-        text-align: center;
-        z-index: 1;
-        width: 100%;
-    }
+        .chapter-details {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
 
-    .upgrade-button {
-        display: inline-block;
-        background: #ff6b6b;
-        color: white !important;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        text-decoration: none;
-        margin-top: 0.5rem;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        pointer-events: auto !important;
-    }
+        /* Right Content Area Styles */
+        .lessons-content {
+            flex: 1;
+        }
 
-    .upgrade-button:hover {
-        background: #ff8787;
-        transform: scale(1.05);
-        color: white !important;
-        text-decoration: none;
-    }
+        .progress-header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
 
-    .locked-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.7);
-        z-index: 5;
-    }
+        .progress-title {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
 
-    .back-to-top {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        background: #ff6b6b;
-        color: white;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-    }
+        .progress-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
 
-    .back-to-top:hover {
-        background: #ff8787;
-        transform: translateY(-5px);
-    }
+        .progress-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .empty-message {
-        text-align: center;
-        padding: 2rem;
-        font-size: 1.2rem;
-        color: #666;
-        background: white;
-        border-radius: 20px;
-        margin: 2rem auto;
-        max-width: 500px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
 
-    .progress-circle-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 2rem;
-    }
+        .lesson-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
 
-    .progress-circle {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        background: conic-gradient(#ff6b6b 0%, #e0e0e0 0%);
-        /* Mặc định 100% màu xám */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-    }
+        .lesson-image {
+            width: 100%;
+            height: 160px;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .progress-text {
-        font-size: 1.5rem;
-        color: #333;
-        font-weight: bold;
-    }
+        .lesson-image img {
+            max-width: 100%;
+            max-height: 100%;
+        }
 
-    .progress-circle .progress-text {
-        position: absolute;
-    }
+        .lesson-content {
+            padding: 15px;
+        }
+
+        .lesson-title {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .lesson-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-button {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 0.9em;
+        }
+
+        .progress-button {
+            background: #e9ecef;
+            color: var(--text-color);
+        }
+
+        .practice-button {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .video-button {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        /* Progress Icons */
+        .progress-status {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+        }
+
+        .not-started {
+            border: 2px solid #ddd;
+        }
+
+        .in-progress {
+            background: #ffd700;
+            color: white;
+        }
+
+        .completed {
+            background: #4CAF50;
+            color: white;
+        }
     </style>
 </head>
 
@@ -310,74 +291,56 @@ try {
     <?php include '../includes/navbar.php'; ?>
 
     <div class="container-fluid pt-4">
-        <div class="container pb-5">
-            <h1 class="main-title">
-                <i class="fas fa-book-reader mr-2"></i>
-                Kho Báu Kiến Thức
-            </h1>
-
-            <?php if (!empty($chuongData)): ?>
-            <?php foreach ($chuongData as $maChuong => $chuong): ?>
-            <div class="chapter-card">
-                <div class="chapter-header">
-                    <i class="fas fa-star mr-2"></i>
-                    <?= htmlspecialchars($chuong['tenChuong']); ?>
-                    <?php if ($chuong['mienPhi'] == 1): ?>
-                    <span class="premium-badge">
-                        <i class="fas fa-crown mr-1"></i>Premium
-                    </span>
-                    <?php endif; ?>
-                </div>
-                <div class="p-3">
-                    <?php if ($chuong['mienPhi'] == 1 && !$isActiveMember): ?>
-                    <div class="upgrade-message">
-                        <i class="fas fa-lock mr-2"></i>
-                        Nội dung này chỉ dành cho thành viên Premium
-                        <br>
-                        <a href="registermember.php" class="upgrade-button">
-                            <i class="fas fa-crown mr-1"></i>
-                            Nâng cấp ngay
-                        </a>
-                    </div>
-                    <?php endif; ?>
-
-                    <?php if (!empty($chuong['baiHocList'])): ?>
-                    <?php foreach ($chuong['baiHocList'] as $baiHoc): ?>
-                    <div class="lesson-item">
-                        <?php
-                                        $lessonUrl = ($chuong['mienPhi'] == 0 || $isActiveMember) 
-                                            ? "video_lessons_detail.php?maBaiHoc=" . htmlspecialchars($baiHoc['maBaiHoc'])
-                                            : "registermember.php";
-                                        ?>
-                        <a href="<?= $lessonUrl ?>" class="lesson-link">
-                            <img src="../assets/img/learning.png" alt="Bài học" class="lesson-icon">
-                            <span><?= htmlspecialchars($baiHoc['tenBaiHoc']); ?></span>
-                        </a>
-                    </div>
-                    <?php endforeach; ?>
+        <div class="learning-container">
+            <!-- Left Sidebar -->
+            <div class="chapters-sidebar">
+                <h5 class="text-center text-primary">DANH SÁCH CHƯƠNG</h5>
+                <input type="text" class="chapter-search" placeholder="Tìm nhanh kỹ năng...">
+                <div class="chapter-list">
+                    <?php if (!empty($chuongData)): ?>
+                        <?php foreach ($chuongData as $chuong): ?>
+                        <div class="chapter-item <?= isset($_GET['maChuong']) && $_GET['maChuong'] === $chuong['MaChuong'] ? 'active' : '' ?>" 
+                            data-chapter="<?= $chuong['MaChuong'] ?>"
+                            onclick="loadChapterLessons('<?= $chuong['MaChuong'] ?>')">
+                            <div class="chapter-title fw-bold"><?= htmlspecialchars($chuong['TenChuong']) ?></div>
+                            <div class="chapter-details">
+                                Chủ điểm: <?= $chuong['SoBaiHoc'] ?>
+                                <br>
+                                Tiến độ: <?= $chuong['BaiHocHoanThanh'] ?>/<?= $chuong['SoBaiHoc'] ?>
+                                <?php if ($chuong['MienPhi'] == 1): ?>
+                                    <span class="premium-badge"><i class="fas fa-crown text-warning"></i></span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
                     <?php else: ?>
-                    <div class="empty-message">
-                        <i class="fas fa-info-circle mr-2"></i>
-                        Chưa có bài học nào trong chương này
-                    </div>
+                        <div class="empty-message">Chưa có chương học nào</div>
                     <?php endif; ?>
                 </div>
             </div>
-            <?php endforeach; ?>
-            <?php else: ?>
-            <div class="empty-message">
-                <i class="fas fa-exclamation-circle mr-2"></i>
-                Hiện tại chưa có bài học nào
-            </div>
-            <?php endif; ?>
 
-            <!-- Hiển thị vòng tròn tiến độ -->
-            <div class="progress" role="progressbar" aria-label="Progress" aria-valuenow="<?= round($progressPercent); ?>" aria-valuemin="0" aria-valuemax="100">
-                <div class="progress-bar bg-warning text-dark" style="width: <?= $progressPercent; ?>%;">
-                    <?= round($progressPercent); ?>%
+            <!-- Right Content Area -->
+            <div class="lessons-content">
+                <div class="progress-header">
+                    <div class="progress-title fw-bold" id="chapterTitle"></div>
+                    <div class="progress-stats">
+                        <div class="progress-indicator">
+                            <span id="completedPoints">0</span>/<span id="totalPoints">0</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-legend">
+                                <span><i class="far fa-circle"></i> Chưa thực hành</span>
+                                <span><i class="fas fa-spinner"></i> Đang thực hành</span>
+                                <span><i class="fas fa-check"></i> Đã hoàn thành</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lessons-grid" id="lessonsGrid">
+                    <!-- Lessons will be loaded here dynamically -->
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -387,6 +350,70 @@ try {
 
     <?php include '../includes/footer.php'; ?>
     <?php include '../includes/scripts.php'; ?>
+    <script>
+    function loadChapterLessons(maChuong) {
+        // Update active chapter
+        document.querySelectorAll('.chapter-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelector(`[data-chapter="${maChuong}"]`).classList.add('active');
+
+        // AJAX request to get chapter lessons
+        fetch(`get_chapter_lessons.php?maChuong=${maChuong}`)
+            .then(response => response.json())
+            .then(data => {
+                const lessonsGrid = document.getElementById('lessonsGrid');
+                document.getElementById('chapterTitle').textContent = data.chapterTitle;
+                
+                // Update progress indicators
+                document.getElementById('completedPoints').textContent = data.completedLessons;
+                document.getElementById('totalPoints').textContent = data.totalLessons;
+
+                // Generate lesson cards
+                lessonsGrid.innerHTML = data.lessons.map(lesson => `
+                    <div class="lesson-card">
+                        <div class="lesson-image">
+                            <a href="video_lessons_detail.php?maBaiHoc=${lesson.MaBaiHoc}" class="lesson-image">
+                                <img src="../assets/img/thumb_2025.png" alt="Lesson">
+                            </a>
+                        </div>
+                        <div class="lesson-content">
+                            <div class="lesson-title">
+                                <a href="video_lessons_detail.php?maBaiHoc=${lesson.MaBaiHoc}" class="text-decoration-none fw-bold text-success">
+                                    ${lesson.TenBai}
+                                </a>
+                            </div>
+                            <div class="lesson-actions d-flex justify-content-between">
+                                <a href="video_lessons_detail.php?maBaiHoc=${lesson.MaBaiHoc}" class="d-flex flex-column align-items-center text-decoration-none fw-bold text-body-secondary">
+                                    <i class="fa-solid fa-video" style="color: #b67ddb"></i> Video
+                                </a>
+                                <a href="theory_lessons.php?maBaiHoc=${lesson.MaBaiHoc}" class="d-flex flex-column align-items-center text-decoration-none fw-bold text-body-secondary">
+                                    <i class="fa-solid fa-book-open" style="color: #55c57a"></i> Lý thuyết
+                                </a>
+                                <a href="quizdetail.php?maBaiHoc=${lesson.MaBaiHoc}" class="d-flex flex-column align-items-center text-decoration-none fw-bold text-body-secondary">
+                                    <i class="fas fa-tasks" style="color: #8b8b8b"></i>
+                                    <span>Bài tập</span>
+                                </a>
+                                <a class="d-flex flex-column align-items-center bg-none border-none fw-bold" 
+                                    title="Tiến độ: ${lesson.ThoiLuongXem}/${lesson.ThoiLuongVideo}">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Tiến độ</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            });
+    }
+
+    // Load first chapter lessons by default
+    document.addEventListener('DOMContentLoaded', () => {
+        const firstChapter = document.querySelector('.chapter-item');
+        if (firstChapter) {
+            loadChapterLessons(firstChapter.dataset.chapter);
+        }
+    });
+    </script>
 </body>
 
 </html>
