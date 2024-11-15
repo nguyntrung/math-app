@@ -85,7 +85,7 @@
         .ranking-table tbody tr:hover {
             background-color: #f8f9fa;
             transform: scale(1.01);
-            transition: all 0.2s;
+            transition: all 1s;
         }
 
         .medal {

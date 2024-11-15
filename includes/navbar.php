@@ -38,7 +38,7 @@ if (isset($_SESSION['MaNguoiDung'])) {
                 <a href="../public/" class="nav-item nav-link active rounded-pill px-4 mx-1 hover-scale">
                     <i class="fas fa-home mr-2"></i>Trang chủ</a>
                 <a href="../public/video_lessons.php" class="nav-item nav-link rounded-pill px-4 mx-1 hover-scale">
-                    <i class="fas fa-play-circle mr-2"></i>Xem bài giảng</a>
+                    <i class="fas fa-play-circle mr-2"></i>Vào học</a>
                 <a href="../public/theory_lessons.php" class="nav-item nav-link rounded-pill px-4 mx-1 hover-scale">
                     <i class="fas fa-book-open mr-2"></i>Học lý thuyết</a>
                 <div class="nav-item dropdown">
@@ -139,9 +139,13 @@ if (isset($_SESSION['MaNguoiDung'])) {
                         </span>
                         <div class="dropdown-divider"></div>
                         <a href="profile.php" class="dropdown-item py-2 px-4 hover-scale">
-                            <i class="fas fa-id-card mr-2"></i>Hồ sơ của bạn</a>
-                        <a href="logout.php" class="dropdown-item py-2 px-4 hover-scale text-danger">
-                            <i class="fas fa-sign-out-alt mr-2"></i>Đăng xuất</a>
+                            <i class="fas fa-id-card mr-2 text-success"></i>Thông tin cá nhân</a>
+                        <a href="registermember.php" class="dropdown-item py-2 px-4 hover-scale">
+                            <i class="fas fa-graduation-cap me-2" style="color: #e46356"></i>Khóa học của bạn</a>
+                        <a href="edit_profile.php" class="dropdown-item py-2 px-4 hover-scale">
+                            <i class="fas fa-key me-2" style="color: #6587ff"></i>Đổi mật khẩu</a>
+                        <a href="logout.php" class="dropdown-item py-2 px-4 hover-scale">
+                            <i class="fas fa-sign-out-alt me-2" style="color: #687187"></i>Đăng xuất</a>
                     </div>
                 </div>
             <?php else: ?>
