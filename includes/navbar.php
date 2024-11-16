@@ -38,9 +38,9 @@ if (isset($_SESSION['MaNguoiDung'])) {
                 <a href="../public/" class="nav-item nav-link active rounded-pill px-4 mx-1 hover-scale">
                     <i class="fas fa-home mr-2"></i>Trang chủ</a>
                 <a href="../public/video_lessons.php" class="nav-item nav-link rounded-pill px-4 mx-1 hover-scale">
-                    <i class="fas fa-play-circle mr-2"></i>Vào học</a>
-                <a href="../public/theory_lessons.php" class="nav-item nav-link rounded-pill px-4 mx-1 hover-scale">
-                    <i class="fas fa-book-open mr-2"></i>Học lý thuyết</a>
+                    <i class="fa-solid fa-graduation-cap mr-2"></i>Vào học</a>
+                <a href="../public/rankings.php" class="nav-item nav-link rounded-pill px-4 mx-1 hover-scale">
+                    <i class="fa-solid fa-ranking-star mr-2"></i>Xếp hạng</a>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle rounded-pill px-4 mx-1 hover-scale" data-toggle="dropdown">
                         <i class="fas fa-pencil-alt mr-2"></i>Làm bài tập</a>
