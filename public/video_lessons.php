@@ -71,7 +71,7 @@ try {
         :root {
             --primary-color: #4CAF50;
             --secondary-color: #2196F3;
-            --background-color: #f5f5f5;
+            --background-color: #f0f0e6;
             --text-color: #333;
         }
 
@@ -190,6 +190,10 @@ try {
             gap: 20px;
         }
 
+        .lessons-grid.two-columns {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
         .lesson-card {
             background: white;
             border-radius: 10px;
@@ -199,16 +203,18 @@ try {
 
         .lesson-image {
             width: 100%;
-            height: 160px;
+            height: 190px;
             background: #e9ecef;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
 
         .lesson-image img {
             max-width: 100%;
             max-height: 100%;
+            object-fit: cover;
         }
 
         .lesson-content {
@@ -327,11 +333,10 @@ try {
                         <div class="progress-indicator">
                             <span id="completedPoints">0</span>/<span id="totalPoints">0</span>
                         </div>
-                        <div class="progress-bar">
+                        <div class="d-flex justify-content-end">
                             <div class="progress-legend">
-                                <span><i class="far fa-circle"></i> Chưa thực hành</span>
-                                <span><i class="fas fa-spinner"></i> Đang thực hành</span>
-                                <span><i class="fas fa-check"></i> Đã hoàn thành</span>
+                                <span><i class="fa-solid fa-circle-dot" style="color: #03a9f4"></i> Chưa hoàn thành</span>
+                                <span><i class="fa-regular fa-circle-check" style="color: #3bab60"></i> Đã hoàn thành</span>
                             </div>
                         </div>
                     </div>
@@ -369,12 +374,22 @@ try {
                 document.getElementById('completedPoints').textContent = data.completedLessons;
                 document.getElementById('totalPoints').textContent = data.totalLessons;
 
+                // Clear previous lessons
+                lessonsGrid.innerHTML = '';
+
+                // Check if there's only one lesson, if so, force 2-column layout
+                if (data.lessons.length === 1) {
+                    lessonsGrid.classList.add('two-columns');
+                } else {
+                    lessonsGrid.classList.remove('two-columns');
+                }
+
                 // Generate lesson cards
                 lessonsGrid.innerHTML = data.lessons.map(lesson => `
                     <div class="lesson-card">
                         <div class="lesson-image">
                             <a href="video_lessons_detail.php?maBaiHoc=${lesson.MaBaiHoc}" class="lesson-image">
-                                <img src="../assets/img/thumb_2025.png" alt="Lesson">
+                                <img src="../assets/img/toan5edu.png" alt="Lesson">
                             </a>
                         </div>
                         <div class="lesson-content">
@@ -395,7 +410,7 @@ try {
                                     <span>Bài tập</span>
                                 </a>
                                 <a class="d-flex flex-column align-items-center bg-none border-none fw-bold" 
-                                    title="Tiến độ: ${lesson.ThoiLuongXem}/${lesson.ThoiLuongVideo}">
+                                    
                                     <i class="fas fa-chart-line"></i>
                                     <span>Tiến độ</span>
                                 </a>
@@ -413,6 +428,25 @@ try {
             loadChapterLessons(firstChapter.dataset.chapter);
         }
     });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.querySelector('.chapter-search');
+        const chapterItems = document.querySelectorAll('.chapter-item');
+
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+
+            chapterItems.forEach(item => {
+                const chapterTitle = item.querySelector('.chapter-title').textContent.toLowerCase();
+                if (chapterTitle.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+
     </script>
 </body>
 
