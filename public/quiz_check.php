@@ -8,6 +8,9 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 
 include '../database/db.php';
 
+date_default_timezone_set('Asia/Ho_Chi_Minh'); // Múi giờ Việt Nam
+echo 'Current timezone: ' . date_default_timezone_get();
+
 if (!isset($_SESSION['startTime'])) {
     $_SESSION['startTime'] = time();
 }
@@ -16,6 +19,8 @@ if (!isset($_SESSION['startTime'])) {
 $showQuiz = true;
 $diem = 0;
 $ngayThi = date('Y-m-d H:i:s'); // Lưu ngày và giờ thi
+
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Kiểm tra xem có dữ liệu từ biểu mẫu không
