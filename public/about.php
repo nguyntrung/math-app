@@ -7,6 +7,7 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 }
 
 include '../database/db.php';
+include '../includes/styles.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,16 +16,13 @@ include '../database/db.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Về Chúng Tôi</title>
     <style>
-        h1, h2, p {
-            margin-bottom: 20px;
-        }
         h1 {
             color: #4CAF50;
             text-align: center;
-            
+            margin-top: 30px;
         }
     </style>
-    <?php include '../includes/styles.php'; ?>
+    
 </head>
 <body>
 
