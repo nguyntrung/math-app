@@ -18,11 +18,13 @@ $stmt = $conn->prepare("
         baihoc.TenBai, 
         tiendoquiz.MaCauHoi, 
         tiendoquiz.CauTraLoi,
-        tiendoquiz.ThoiGianLam
+        tiendohoctap.ThoiLuongXem
     FROM chuonghoc
     LEFT JOIN baihoc ON chuonghoc.MaChuong = baihoc.MaChuong
     LEFT JOIN tiendoquiz ON baihoc.MaBaiHoc = tiendoquiz.MaBaiHoc 
     AND tiendoquiz.MaNguoiDung = :maNguoiDung
+    LEFT JOIN tiendohoctap ON baihoc.MaBaiHoc = tiendohoctap.MaBaiHoc 
+    AND tiendohoctap.MaNguoiDung = :maNguoiDung
     ORDER BY chuonghoc.ThuTu ASC, baihoc.ThuTu ASC
 ");
 $stmt->execute(['maNguoiDung' => $_SESSION['MaNguoiDung']]);
@@ -36,15 +38,12 @@ foreach ($chuongBaiHocList as $row) {
     $maBaiHoc = $row['MaBaiHoc'];
     $tenBaiHoc = $row['TenBai'];
     $isCompleted = !is_null($row['CauTraLoi']); // Kiểm tra nếu câu trả lời có tồn tại
-    $timeSpent = $row['ThoiGianLam']; // Thời gian làm bài theo kiểu float
+    $timeSpent = $row['ThoiLuongXem']; // Thời gian làm bài theo kiểu float
 
-    // Chuyển thời gian từ giây hoặc phút sang định dạng giờ:phút:giây (nếu cần)
+
     $minutes = floor($timeSpent);
     $seconds = round(($timeSpent - $minutes) * 60);
-
-    // Đảm bảo rằng thời gian làm bài không bị quá dài và hiển thị đúng
     $timeFormatted = sprintf("%02d:%02d", $minutes, $seconds);
-
     // Kiểm tra xem chương đã tồn tại chưa
     if (!isset($chuongData[$maChuong])) {
         $chuongData[$maChuong] = [

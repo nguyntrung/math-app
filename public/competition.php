@@ -13,6 +13,17 @@ $showQuiz = true;
 $diem = 0;
 $thoiGianThi = 0; // Đặt giá trị mặc định là 0
 
+date_default_timezone_set('Asia/Ho_Chi_Minh'); // Múi giờ Việt Nam
+echo 'Current timezone: ' . date_default_timezone_get();
+
+// Lưu kết quả vào bảng ketquakiemtra
+$maNguoiDung = $_SESSION['MaNguoiDung']; 
+$ngayThi = date('Y-m-d H:i:s'); // Ngày giờ thi
+
+if (!isset($_SESSION['startTime'])) {
+    $_SESSION['startTime'] = time(); // Timestamp chuẩn
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Kiểm tra xem có dữ liệu từ biểu mẫu không
     if (isset($_POST['cauHoi'])) {
@@ -38,14 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $showQuiz = false;
         $diem = 0; // Hoặc có thể thông báo lỗi
     }
-
-    if (isset($_POST['startTime'])) {
-        $startTime = (int) $_POST['startTime'];
-        $endTime = time();
-        $thoiGianThi = $endTime - $startTime; // Tổng thời gian làm bài (giây)
-    } else {
-        $thoiGianThi = 0;
-    }
 }
 
 // Nếu cần thiết, lấy 10 câu hỏi ngẫu nhiên từ cơ sở dữ liệu
@@ -55,15 +58,16 @@ if ($showQuiz) {
     $cauHoiList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Lưu kết quả vào bảng ketquakiemtra
-$maNguoiDung = $_SESSION['MaNguoiDung']; 
-$ngayThi = date('Y-m-d H:i:s'); // Ngày giờ thi
-$thoiGianThiFormatted = gmdate("H:i:s", $thoiGianThi); // Định dạng "giờ:phút:giây"
+// Nhận thời gian bắt đầu (giả sử đây là thời điểm gửi form)
+$startTime = strtotime($_SESSION['startTime']); // Timestamp chuẩn từ múi giờ
+$endTime = strtotime($ngayThi);
+$thoiGianThi = strtotime($endTime) - strtotime($startTime); // Tính thời gian thi (giây)
+//$thoiGianThiFormatted = gmdate("H:i:s", $thoiGianThi); // Định dạng "giờ:phút:giây"
 
 $sql = "INSERT INTO ketquakiemtra (MaNguoiDung, Diem, ThoiGianThi, NgayThi)
             VALUES (?, ?, ?, ?)";
 $stmt = $conn->prepare($sql);
-$stmt->execute([$maNguoiDung, $diem, $thoiGianThiFormatted, $ngayThi]);
+$stmt->execute([$maNguoiDung, $diem, $thoiGianThi, $ngayThi]);
 
 
 ?>
