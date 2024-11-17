@@ -1,3 +1,13 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['MaNguoiDung'])) {
+    header('Location: login.php');
+    exit();
+}
+
+include '../database/db.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,32 +15,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Về Chúng Tôi</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            background-color: #f9f9f9;
-            color: #333;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
         h1, h2, p {
             margin-bottom: 20px;
         }
         h1 {
             color: #4CAF50;
             text-align: center;
+            
         }
     </style>
     <?php include '../includes/styles.php'; ?>
