@@ -1,14 +1,3 @@
-<?php
-session_start();
-
-if (!isset($_SESSION['MaNguoiDung'])) {
-    header('Location: login.php');
-    exit();
-}
-
-include '../database/db.php';
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,10 +24,6 @@ include '../database/db.php';
             <div class="form-group">
                 <label for="email">Email:</label>
                 <input type="email" class="form-control" id="email" name="email">
-            </div>
-            <div class="form-group">
-                <label for="lop">Lớp:</label>
-                <input type="text" class="form-control" id="lop" name="lop" value="5">
             </div>
             <div class="form-group">
                 <label for="noi_dung">Nội dung:</label>

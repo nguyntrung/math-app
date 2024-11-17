@@ -112,6 +112,12 @@
             <div data-i18n="Tables">Câu Hỏi Tự Luận</div>
          </a>
       </li>
+      <li class="menu-item">
+         <a href="admin_contact.php" class="menu-link">
+            <i class="menu-icon tf-icons ri-table-alt-line"></i>
+            <div data-i18n="Tables">Quản Lý Liên Hệ</div>
+         </a>
+      </li>
       <!-- Misc -->
       <li class="menu-header mt-7"><span class="menu-header-text">Misc</span></li>
       <li class="menu-item">

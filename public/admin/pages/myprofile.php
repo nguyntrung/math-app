@@ -52,10 +52,8 @@ data-assets-path="../assets/" data-template="vertical-menu-template-free" data-s
             <?php include 'sidebar.php'; ?>
             <div class="layout-page">
                 <?php include 'navbar.php'; ?>
-            
                 <div class="card">
                     <div class="card-header">
-                
                         <div class="profile-container">
                         <h2>My Profile</h2>
                     </div>
@@ -73,12 +71,12 @@ data-assets-path="../assets/" data-template="vertical-menu-template-free" data-s
                         </div>
                         </div>
                 </div>
+                <?php include 'footer.php'; ?>
             </div>
             <div class="layout-overlay layout-menu-toggle"></div>
         </div>
+        <?php include 'other.php'; ?>
     </div>
-    <?php include 'other.php'; ?>
-
 </body>
 </html>
 
