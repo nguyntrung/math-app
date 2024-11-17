@@ -15,7 +15,6 @@ if (!isset($_SESSION['startTime'])) {
 // Khởi tạo biến để kiểm tra xem có cần hiển thị câu hỏi hay không
 $showQuiz = true;
 $diem = 0;
-$loaiKiemTra = '15p'; // Đặt loại kiểm tra là 15 phút
 $ngayThi = date('Y-m-d H:i:s'); // Lưu ngày và giờ thi
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -42,9 +41,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $thoiGianThi = strtotime($endTime) - strtotime($startTime); // Tính thời gian thi (giây)
     
             // Lưu kết quả vào bảng ketquakiemtra
-            $stmtInsert = $conn->prepare("INSERT INTO ketquakiemtra (MaNguoiDung, Diem, LoaiKiemTra, ThoiGianThi, NgayThi) 
-                                                    VALUES (?, ?, ?, ?, ?)");
-            $stmtInsert->execute([$_SESSION['MaNguoiDung'], $diem, $loaiKiemTra, $thoiGianThi, $ngayThi]);
+            $stmtInsert = $conn->prepare("INSERT INTO ketquakiemtra (MaNguoiDung, Diem, ThoiGianThi, NgayThi) 
+                                                    VALUES (?, ?, ?, ?)");
+            $stmtInsert->execute([$_SESSION['MaNguoiDung'], $diem, $thoiGianThi, $ngayThi]);
 
         // Đặt biến để không hiển thị câu hỏi nữa
         $showQuiz = false;

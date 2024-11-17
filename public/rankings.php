@@ -16,7 +16,6 @@
     $stmtRanking = $conn->prepare("SELECT nguoidung.HoTen, ketquakiemtra.Diem, ketquakiemtra.NgayThi 
                                             FROM ketquakiemtra 
                                             JOIN nguoidung ON ketquakiemtra.MaNguoiDung = nguoidung.MaNguoiDung
-                                            WHERE ketquakiemtra.LoaiKiemTra = '15p'
                                             ORDER BY ketquakiemtra.Diem DESC, ketquakiemtra.NgayThi ASC");
     $stmtRanking->execute();
     $rankingList = $stmtRanking->fetchAll(PDO::FETCH_ASSOC);
