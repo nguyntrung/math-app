@@ -266,7 +266,7 @@ $stmt->execute([$maNguoiDung, $diem, $thoiGianThiFormatted, $ngayThi]);
                     </div>
                 </div>
 
-                <a href="quiz_check_45.php" class="btn btn-primary btn-lg">
+                <a href="video_lessons.php" class="btn btn-primary btn-lg">
                     <i class="fas fa-arrow-left mr-2"></i>Trở Về Bài Học
                 </a>
             </div>
