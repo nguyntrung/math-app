@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['MaNguoiDung'])) {
+    header('Location: login.php');
+    exit();
+}
+
+include '../database/db.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
