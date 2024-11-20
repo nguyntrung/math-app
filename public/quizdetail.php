@@ -348,7 +348,7 @@ try {
             const timeSpent = (now - startTime) / 60000;
 
             try {
-                const response = await fetch('save_progresss.php', {
+                const response = await fetch('save_progress.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
