@@ -62,20 +62,20 @@ if ($stmt->rowCount() > 0) {
                                         if (count($lienhes) > 0) {
                                             foreach ($lienhes as $contact) {
                                                 echo "<tr>";
-                                                echo "<td class='text-truncate'>" . htmlspecialchars($contact["id"]) . "</td>";
+                                                echo "<td class='text-truncate'>" . htmlspecialchars($contact["MaLienHe"]) . "</td>";
                                                 echo "<td class='text-truncate'>
                                                         <div class='d-flex align-items-center'>
                                                             <div class='avatar avatar-sm me-4'>
-                                                                <img src='../assets/img/avatars/" . htmlspecialchars($contact['id']) . ".png' alt='Avatar' class='rounded-circle' />
+                                                                <img src='../assets/img/avatars/" . htmlspecialchars($contact['MaLienHe']) . ".png' alt='Avatar' class='rounded-circle' />
                                                             </div>
                                                             <div>
-                                                                <h6 class='mb-0 text-truncate'>" . htmlspecialchars($contact["ho_ten"]) . "</h6>
+                                                                <h6 class='mb-0 text-truncate'>" . htmlspecialchars($contact["HoTen"]) . "</h6>
                                                             </div>
                                                         </div>
                                                     </td>";
-                                                echo "<td class='text-truncate'>" . htmlspecialchars($contact["email"]) . "</td>";
-                                                echo "<td class='text-truncate'>" . htmlspecialchars($contact["noi_dung"]) . "</td>";
-                                                echo "<td class='text-truncate'>" . date("d-m-Y H:i:s", strtotime($contact["ngay_gio"])) . "</td>";
+                                                echo "<td class='text-truncate'>" . htmlspecialchars($contact["Email"]) . "</td>";
+                                                echo "<td class='text-truncate'>" . htmlspecialchars($contact["NoiDung"]) . "</td>";
+                                                echo "<td class='text-truncate'>" . date("d-m-Y H:i:s", strtotime($contact["NgayGio"])) . "</td>";
                                                 echo "</tr>";
                                             }
                                         } else {
