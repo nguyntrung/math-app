@@ -19,7 +19,7 @@ if (!$data) {
 
 try {
     $stmt = $conn->prepare("
-        INSERT INTO tiendoquiz 
+        INSERT INTO tiendohoctap 
         (MaNguoiDung, MaBaiHoc, MaCauHoi, CauTraLoi, ThoiGianLam) 
         VALUES 
         (:maNguoiDung, :maBaiHoc, :maCauHoi, :cauTraLoi, :thoiGianLam)

@@ -16,12 +16,12 @@ $stmt = $conn->prepare("
         chuonghoc.TenChuong, 
         baihoc.MaBaiHoc, 
         baihoc.TenBai, 
-        SUM(tiendoquiz.ThoiGianLam) AS TotalTimeSpent,  -- Sum of time spent on each question in the lesson
-        COUNT(tiendoquiz.MaCauHoi) AS AnsweredQuestions   -- Count the number of questions answered
+        SUM(tiendohoctap.ThoiGianLam) AS TotalTimeSpent,  -- Sum of time spent on each question in the lesson
+        COUNT(tiendohoctap.MaCauHoi) AS AnsweredQuestions   -- Count the number of questions answered
     FROM chuonghoc
     LEFT JOIN baihoc ON chuonghoc.MaChuong = baihoc.MaChuong
-    LEFT JOIN tiendoquiz ON baihoc.MaBaiHoc = tiendoquiz.MaBaiHoc 
-    AND tiendoquiz.MaNguoiDung = :maNguoiDung
+    LEFT JOIN tiendohoctap ON baihoc.MaBaiHoc = tiendohoctap.MaBaiHoc 
+    AND tiendohoctap.MaNguoiDung = :maNguoiDung
     GROUP BY chuonghoc.MaChuong, baihoc.MaBaiHoc
     ORDER BY chuonghoc.ThuTu ASC, baihoc.ThuTu ASC
 ");
