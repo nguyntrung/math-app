@@ -9,8 +9,6 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 include '../database/db.php';
 
 date_default_timezone_set('Asia/Ho_Chi_Minh'); // Múi giờ Việt Nam
-echo 'Current timezone: ' . date_default_timezone_get();
-
 if (!isset($_SESSION['startTime'])) {
     $_SESSION['startTime'] = time();
 }
