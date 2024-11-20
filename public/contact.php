@@ -29,16 +29,16 @@ include '../database/db.php';
             
             <form action="submit_contact.php" method="post">
             <div class="form-group">
-                <label for="ho_ten">Họ và tên:</label>
-                <input type="text" class="form-control" id="ho_ten" name="ho_ten">
+                <label for="HoTen">Họ và tên:</label>
+                <input type="text" class="form-control" id="HoTen" name="HoTen">
             </div>
             <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" class="form-control" id="email" name="email">
+                <label for="Email">Email:</label>
+                <input type="Email" class="form-control" id="Email" name="Email">
             </div>
             <div class="form-group">
-                <label for="noi_dung">Nội dung:</label>
-                <textarea class="form-control" id="noi_dung" name="noi_dung" rows="4"></textarea><br><br>
+                <label for="NoiDung">Nội dung:</label>
+                <textarea class="form-control" id="NoiDung" name="NoiDung" rows="4"></textarea><br><br>
             </div>
                 <button type="submit" class="btn btn-primary">GỬI ĐI</button>
             </form>

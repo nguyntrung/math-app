@@ -14,16 +14,16 @@ if ($conn->connect_error) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Lấy dữ liệu từ form và xử lý ký tự đặc biệt
-    $ho_ten = htmlspecialchars(trim($_POST["ho_ten"]));
-    $email = htmlspecialchars(trim($_POST["email"]));
-    $noi_dung = htmlspecialchars(trim($_POST["noi_dung"]));
+    $hoten = htmlspecialchars(trim($_POST["HoTen"]));
+    $email = htmlspecialchars(trim($_POST["Email"]));
+    $noidung = htmlspecialchars(trim($_POST["NoiDung"]));
 
     // Kiểm tra tính hợp lệ của dữ liệu
-    if (!empty($ho_ten) && !empty($email) && !empty($noi_dung)) {
+    if (!empty($hoten) && !empty($email) && !empty($noidung)) {
         
-        $sql = "INSERT INTO lienhe (ho_ten, email, noi_dung) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO lienhe (HoTen, Email, NoiDung) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sss", $ho_ten, $email, $noi_dung);
+        $stmt->bind_param("sss", $hoten, $email, $noidung);
 
         if ($stmt->execute()) {
             echo "Cảm ơn bạn đã liên hệ! Chúng tôi sẽ sớm liên lạc lại với bạn.";
