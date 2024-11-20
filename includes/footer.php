@@ -5,7 +5,7 @@
         <div class="col-lg-4 col-md-6 mb-5">
             <a href="" class="navbar-brand font-weight-bold text-primary m-0 mb-4 p-0" style="font-size: 40px; line-height: 40px;">
                 <i class="flaticon-043-teddy-bear"></i>
-                <span class="text-dark">ToanLop5.vn</span>
+                <span class="text-dark">TOAN5.VN</span>
             </a>
             <p>Chào mừng bạn đến với ToanLop5.vn, nơi cung cấp những bài học toán thú vị cho học sinh tiểu học. Chúng tôi luôn nỗ lực mang đến cho các bạn những kiến thức bổ ích và dễ hiểu nhất!</p>
             <div class="d-flex justify-content-start mt-4">
@@ -57,7 +57,7 @@
     <!-- Footer Bottom -->
     <div class="container-fluid pt-5" style="border-top: 1px solid rgba(23, 162, 184, .2);">
         <p class="m-0 text-center text-dark">
-            &copy; <a class="text-info font-weight-bold" href="#">ToanLop5.vn</a>. Tất cả quyền được bảo vệ. 
+            &copy; <a class="text-info font-weight-bold" href="#">toan5.vn</a>. Tất cả quyền được bảo vệ. 
             Thiết kế bởi <a class="text-info font-weight-bold" href="https://htmlcodex.com">HTML Codex</a>
         </p>
     </div>

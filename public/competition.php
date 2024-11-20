@@ -63,7 +63,7 @@ $endTime = strtotime($ngayThi);
 $thoiGianThi = strtotime($endTime) - strtotime($startTime); // Tính thời gian thi (giây)
 //$thoiGianThiFormatted = gmdate("H:i:s", $thoiGianThi); // Định dạng "giờ:phút:giây"
 
-$sql = "INSERT INTO ketquakiemtra (MaNguoiDung, Diem, ThoiGianThi, NgayThi)
+$sql = "INSERT INTO ketqua (MaNguoiDung, Diem, ThoiGianThi, NgayThi)
             VALUES (?, ?, ?, ?)";
 $stmt = $conn->prepare($sql);
 $stmt->execute([$maNguoiDung, $diem, $thoiGianThi, $ngayThi]);

@@ -10,9 +10,39 @@ if (!isset($_GET['maChuong'])) {
     exit;
 }
 
+$maChuong = $_GET['maChuong'];
+
 try {
-    $maChuong = $_GET['maChuong'];
-    
+    // Kiểm tra trạng thái thành viên
+    $isActiveMember = false;
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) as active_count 
+        FROM dangkythanhvien 
+        WHERE MaNguoiDung = :maNguoiDung 
+        AND TrangThai = 'DANG_HOAT_DONG' 
+        AND NgayKetThuc >= CURRENT_DATE()
+    ");
+    $stmt->bindParam(':maNguoiDung', $_SESSION['MaNguoiDung']);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($result['active_count'] > 0) {
+        $isActiveMember = true;
+    }
+
+    // Kiểm tra xem đây có phải là chương miễn phí không
+    $stmt = $conn->prepare("SELECT MienPhi FROM chuonghoc WHERE MaChuong = :maChuong");
+    $stmt->bindParam(':maChuong', $maChuong);
+    $stmt->execute();
+    $chuongInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Nếu không phải chương miễn phí và không phải thành viên active
+    if (!$chuongInfo['MienPhi'] && !$isActiveMember) {
+        echo json_encode([
+            'requiresMembership' => true
+        ]);
+        exit();
+    }
+
     // Get chapter info
     $stmt = $conn->prepare("
         SELECT TenChuong 
@@ -53,7 +83,8 @@ try {
         'chapterTitle' => $chapter['TenChuong'],
         'lessons' => $lessons,
         'completedLessons' => $completedLessons,
-        'totalLessons' => count($lessons)
+        'totalLessons' => count($lessons),
+        'requiresMembership' => false
     ]);
 
 } catch (PDOException $e) {

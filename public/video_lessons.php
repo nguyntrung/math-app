@@ -154,6 +154,23 @@ try {
             margin-top: 5px;
         }
 
+        .chapter-item[data-free="0"] {
+            position: relative;
+            opacity: 0.8;
+        }
+
+        .premium-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .chapter-item[data-free="0"]:not(.active):hover {
+            cursor: pointer;
+            background: #f8f9fa;
+            opacity: 1;
+        }
+
         /* Right Content Area Styles */
         .lessons-content {
             flex: 1;
@@ -307,17 +324,18 @@ try {
                         <?php foreach ($chuongData as $chuong): ?>
                         <div class="chapter-item <?= isset($_GET['maChuong']) && $_GET['maChuong'] === $chuong['MaChuong'] ? 'active' : '' ?>" 
                             data-chapter="<?= $chuong['MaChuong'] ?>"
-                            onclick="loadChapterLessons('<?= $chuong['MaChuong'] ?>')">
+                            data-free="<?= $chuong['MienPhi'] ?>"
+                            onclick="handleChapterClick('<?= $chuong['MaChuong'] ?>', <?= $chuong['MienPhi'] ?>, <?= $isActiveMember ? 'true' : 'false' ?>)">
                             <div class="chapter-title fw-bold"><?= htmlspecialchars($chuong['TenChuong']) ?></div>
-                            <div class="chapter-details">
-                                Chủ điểm: <?= $chuong['SoBaiHoc'] ?>
-                                <br>
-                                Tiến độ: <?= $chuong['BaiHocHoanThanh'] ?>/<?= $chuong['SoBaiHoc'] ?>
-                                <?php if ($chuong['MienPhi'] == 1): ?>
-                                    <span class="premium-badge"><i class="fas fa-crown text-warning"></i></span>
-                                <?php endif; ?>
+                                <div class="chapter-details">
+                                    Chủ điểm: <?= $chuong['SoBaiHoc'] ?>
+                                    <br>
+                                    Tiến độ: <?= $chuong['BaiHocHoanThanh'] ?>/<?= $chuong['SoBaiHoc'] ?>
+                                    <?php if ($chuong['ThuTu'] > 1 && !$isActiveMember): ?>
+                                        <span class="premium-badge"><i class="fas fa-lock text-warning"></i></span>
+                                    <?php endif; ?>
+                                </div>
                             </div>
-                        </div>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <div class="empty-message">Chưa có chương học nào</div>
@@ -335,8 +353,9 @@ try {
                         </div>
                         <div class="d-flex justify-content-end">
                             <div class="progress-legend">
-                                <span><i class="fa-solid fa-circle-dot" style="color: #03a9f4"></i> Chưa hoàn thành</span>
-                                <span><i class="fa-regular fa-circle-check" style="color: #3bab60"></i> Đã hoàn thành</span>
+                                <span class="mr-3"><i class="fa-solid fa-circle-dot" style="color: #c6cfe1"></i> Chưa hoàn thành</span>
+                                <span class="mr-3"><i class="fa-solid fa-circle-dot" style="color: #03a9f4"></i> Đang hoàn thành</span>
+                                <span class="mr-3"><i class="fa-regular fa-circle-check" style="color: #3bab60"></i> Đã hoàn thành</span>
                             </div>
                         </div>
                     </div>
@@ -356,23 +375,44 @@ try {
     <?php include '../includes/footer.php'; ?>
     <?php include '../includes/scripts.php'; ?>
     <script>
+    function handleChapterClick(maChuong, mienPhi, isActiveMember) {
+        // Nếu là chương miễn phí (chương 1) thì cho phép truy cập
+        if (mienPhi === 1) {
+            loadChapterLessons(maChuong);
+            return;
+        }
+        
+        // Nếu không phải chương miễn phí và không phải thành viên active
+        if (!isActiveMember) {
+            window.location.href = 'registermember.php';
+            return;
+        }
+        
+        // Nếu là thành viên active, cho phép truy cập
+        loadChapterLessons(maChuong);
+    }
     function loadChapterLessons(maChuong) {
-        // Update active chapter
-        document.querySelectorAll('.chapter-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        document.querySelector(`[data-chapter="${maChuong}"]`).classList.add('active');
+    // Update active chapter
+    document.querySelectorAll('.chapter-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    document.querySelector(`[data-chapter="${maChuong}"]`).classList.add('active');
 
-        // AJAX request to get chapter lessons
-        fetch(`get_chapter_lessons.php?maChuong=${maChuong}`)
-            .then(response => response.json())
-            .then(data => {
-                const lessonsGrid = document.getElementById('lessonsGrid');
-                document.getElementById('chapterTitle').textContent = data.chapterTitle;
-                
-                // Update progress indicators
-                document.getElementById('completedPoints').textContent = data.completedLessons;
-                document.getElementById('totalPoints').textContent = data.totalLessons;
+    // AJAX request to get chapter lessons
+    fetch(`get_chapter_lessons.php?maChuong=${maChuong}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.requiresMembership) {
+                window.location.href = 'registermember.php';
+                return;
+            }
+            
+            const lessonsGrid = document.getElementById('lessonsGrid');
+            document.getElementById('chapterTitle').textContent = data.chapterTitle;
+            
+            // Update progress indicators
+            document.getElementById('completedPoints').textContent = data.completedLessons;
+            document.getElementById('totalPoints').textContent = data.totalLessons;
 
                 // Clear previous lessons
                 lessonsGrid.innerHTML = '';
@@ -409,9 +449,8 @@ try {
                                     <i class="fas fa-tasks" style="color: #8b8b8b"></i>
                                     <span>Bài tập</span>
                                 </a>
-                                <a class="d-flex flex-column align-items-center bg-none border-none fw-bold" 
-                                    
-                                    <i class="fas fa-chart-line"></i>
+                                <a href="learning_progress.php" class="d-flex flex-column align-items-center text-decoration-none fw-bold text-body-secondary">
+                                    <i class="fa-regular fa-circle-check" style="color: #3bab60"></i>
                                     <span>Tiến độ</span>
                                 </a>
                             </div>
