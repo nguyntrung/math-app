@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $thoiGianThi = strtotime($endTime) - strtotime($startTime); // Tính thời gian thi (giây)
     
             // Lưu kết quả vào bảng ketquakiemtra
-            $stmtInsert = $conn->prepare("INSERT INTO ketquakiemtra (MaNguoiDung, Diem, ThoiGianThi, NgayThi) 
+            $stmtInsert = $conn->prepare("INSERT INTO ketqua (MaNguoiDung, Diem, ThoiGianThi, NgayThi) 
                                                     VALUES (?, ?, ?, ?)");
             $stmtInsert->execute([$_SESSION['MaNguoiDung'], $diem, $thoiGianThi, $ngayThi]);
 
