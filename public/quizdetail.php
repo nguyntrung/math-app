@@ -42,7 +42,7 @@ try {
     // Lấy tiến độ làm bài của người dùng
     $stmt = $conn->prepare("
         SELECT MaCauHoi, CauTraLoi, ThoiGianLam
-        FROM tiendoquiz
+        FROM tiendohoctap
         WHERE MaNguoiDung = :maNguoiDung 
         AND MaBaiHoc = :maBaiHoc
     ");

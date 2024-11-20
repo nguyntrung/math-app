@@ -33,41 +33,12 @@ try {
     $duongDanVideo = $lesson['DuongDanVideo'] ?? null;
     $videoDuration = $lesson['ThoiLuongVideo'] ?? 0; 
 
-    // Lấy tiến độ học tập của người dùng
-    $stmtProgress = $conn->prepare("SELECT ThoiLuongXem FROM TienDoHocTap WHERE MaNguoiDung = :maNguoiDung AND MaBaiHoc = :maBaiHoc");
-    $stmtProgress->bindParam(':maNguoiDung', $maNguoiDung, PDO::PARAM_INT);
-    $stmtProgress->bindParam(':maBaiHoc', $maBaiHoc, PDO::PARAM_INT);
-    $stmtProgress->execute();
-    $progress = $stmtProgress->fetch(PDO::FETCH_ASSOC);
-
-    // Tính toán tiến độ học tập
-    if ($progress) {
-        $watchedTime = $progress['ThoiLuongXem']; // Thời gian đã xem
-        $progressPercentage = ($watchedTime / $videoDuration) * 100; // Tính tiến độ học tập
-    } else {
-        $progressPercentage = 0; // Nếu chưa có tiến độ, mặc định là 0%
-    }
 
     // Lấy bài học tiếp theo
     $stmtNext = $conn->prepare("SELECT MaBaiHoc, TenBai FROM BaiHoc WHERE MaBaiHoc > :maBaiHoc ORDER BY MaBaiHoc ASC LIMIT 1");
     $stmtNext->bindParam(':maBaiHoc', $maBaiHoc, PDO::PARAM_INT);
     $stmtNext->execute();
     $nextLesson = $stmtNext->fetch(PDO::FETCH_ASSOC);
-
-    // Kiểm tra xem người dùng đã hoàn thành bài học chưa
-    $stmtCheckCompletion = $conn->prepare("SELECT NgayHoanThanh, ThoiLuongXem FROM TienDoHocTap WHERE MaNguoiDung = :maNguoiDung AND MaBaiHoc = :maBaiHoc");
-    $stmtCheckCompletion->bindParam(':maNguoiDung', $maNguoiDung, PDO::PARAM_INT);
-    $stmtCheckCompletion->bindParam(':maBaiHoc', $maBaiHoc, PDO::PARAM_INT);
-    $stmtCheckCompletion->execute();
-    $completion = $stmtCheckCompletion->fetch(PDO::FETCH_ASSOC);
-
-    // Cập nhật trạng thái hoàn thành nếu người dùng chưa hoàn thành
-    if ($completion && !$completion['NgayHoanThanh']) {
-        $stmtUpdateCompletion = $conn->prepare("UPDATE TienDoHocTap SET NgayHoanThanh = NOW() WHERE MaNguoiDung = :maNguoiDung AND MaBaiHoc = :maBaiHoc");
-        $stmtUpdateCompletion->bindParam(':maNguoiDung', $maNguoiDung, PDO::PARAM_INT);
-        $stmtUpdateCompletion->bindParam(':maBaiHoc', $maBaiHoc, PDO::PARAM_INT);
-        $stmtUpdateCompletion->execute();
-    }
 
 } catch (PDOException $e) {
     echo "Lỗi: " . $e->getMessage();
@@ -85,7 +56,7 @@ try {
     <?php include '../includes/styles.php'; ?>
     <style>
         body {
-        background-color: #f0f9ff;
+            background-color: #f0f9ff;
         }
 
         h4 {
@@ -210,30 +181,6 @@ try {
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-
-        #progress {
-            height: 20px;
-            border-radius: 10px;
-            background-color: #e5f5ff;
-            border: 2px solid #4a90e2;
-        }
-
-        #progress::-webkit-progress-bar {
-            background-color: #e5f5ff;
-            border-radius: 10px;
-        }
-
-        #progress::-webkit-progress-value {
-            background-color: #4a90e2;
-            border-radius: 8px;
-        }
-
-        #progress-text {
-            color: #4a90e2;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 5px;
-        }
     </style>
 </head>
 
@@ -288,55 +235,6 @@ try {
     <?php include '../includes/scripts.php'; ?>
     <script src="../assets/js/main.js"></script>
 
-    <!-- Lấy thời gian xem video và cập nhật tiến độ -->
-    <script>
-    const video = document.querySelector('video');
-    const progressBar = document.querySelector('#progress');
-    const progressText = document.querySelector('#progress-text');
-
-    // Đảm bảo video đã tải và có thể lấy thời gian
-    video.addEventListener('loadedmetadata', () => {
-        const videoDuration = video.duration; // Thời gian tổng của video (tính bằng giây)
-
-        // Cập nhật khi video đang phát
-        video.addEventListener('timeupdate', () => {
-            const watchedDuration = video.currentTime; // Thời gian đã xem (tính bằng giây)
-
-            // Tính toán phần trăm đã xem
-            const watchedPercentage = (watchedDuration / videoDuration) * 100;
-
-            // Cập nhật thanh tiến độ
-            progressBar.value = watchedPercentage;
-            progressText.textContent = Math.round(watchedPercentage) + "%";
-        });
-
-        // Gửi tiến độ học tập lên server khi video kết thúc
-        video.addEventListener('ended', () => {
-            const watchedDuration = video
-                .duration; // Nếu video đã xem hết, gán thời gian hoàn thành cho người dùng
-            fetch('save_progress.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        maBaiHoc: <?= json_encode($maBaiHoc); ?>, // Mã bài học từ PHP
-                        watchedDuration: watchedDuration // Gửi thời gian video đã hoàn thành
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        alert("Bạn đã hoàn thành bài học!");
-                    } else {
-                        alert("Có lỗi xảy ra khi lưu tiến độ.");
-                    }
-                })
-                .catch(error => console.error("Lỗi khi lưu tiến độ:", error));
-        });
-    });
-    </script>
-
 </body>
 
-</html>     
+</html> 

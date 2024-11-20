@@ -39,7 +39,6 @@ try {
                 JOIN BaiHoc b ON t.MaBaiHoc = b.MaBaiHoc
                 WHERE b.MaChuong = ChuongHoc.MaChuong
                 AND t.MaNguoiDung = :maNguoiDung
-                AND t.ThoiLuongXem = b.ThoiLuongVideo
             ) as BaiHocHoanThanh
         FROM ChuongHoc
         LEFT JOIN BaiHoc ON ChuongHoc.MaChuong = BaiHoc.MaChuong
@@ -329,8 +328,6 @@ try {
                             <div class="chapter-title fw-bold"><?= htmlspecialchars($chuong['TenChuong']) ?></div>
                                 <div class="chapter-details">
                                     Chủ điểm: <?= $chuong['SoBaiHoc'] ?>
-                                    <br>
-                                    Tiến độ: <?= $chuong['BaiHocHoanThanh'] ?>/<?= $chuong['SoBaiHoc'] ?>
                                     <?php if ($chuong['ThuTu'] > 1 && !$isActiveMember): ?>
                                         <span class="premium-badge"><i class="fas fa-lock text-warning"></i></span>
                                     <?php endif; ?>
