@@ -14,7 +14,6 @@ $diem = 0;
 $thoiGianThi = 0; // Đặt giá trị mặc định là 0
 
 date_default_timezone_set('Asia/Ho_Chi_Minh'); // Múi giờ Việt Nam
-echo 'Current timezone: ' . date_default_timezone_get();
 
 // Lưu kết quả vào bảng ketquakiemtra
 $maNguoiDung = $_SESSION['MaNguoiDung']; 
