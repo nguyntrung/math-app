@@ -208,7 +208,7 @@
                         <p class="school-name">toan5.vn</p>
                      </div>
                      <div class="podium-block p2">
-                        <span class="rank-number">2</span>
+                        <span class="rank-number text-danger"><?= htmlspecialchars($rankingList[1]['Diem'] ?? 'Chưa có'); ?> điểm</span>
                      </div>
                   </div>
                   <!-- First Place -->
@@ -225,7 +225,7 @@
                         <p class="school-name">toan5.vn</p>
                      </div>
                      <div class="podium-block p1">
-                        <span class="rank-number">1</span>
+                        <span class="rank-number text-danger"><?= htmlspecialchars($rankingList[0]['Diem'] ?? 'Chưa có'); ?> điểm</span>
                      </div>
                   </div>
                   <!-- Third Place -->
@@ -241,7 +241,7 @@
                         <p class="school-name">toan5.vn</p>
                      </div>
                      <div class="podium-block p3">
-                        <span class="rank-number">3</span>
+                        <span class="rank-number text-danger"><?= htmlspecialchars($rankingList[2]['Diem'] ?? 'Chưa có'); ?> điểm</span>
                      </div>
                   </div>
                </div>
@@ -257,6 +257,7 @@
                         <h5 class="rank-name"><?= htmlspecialchars($rankingList[$i]['HoTen']); ?></h5>
                         <p class="rank-school">toan5.vn</p>
                      </div>
+                     <span class="rank-number text-danger"><?= htmlspecialchars($rankingList[$i]['Diem'] ?? 'Chưa có'); ?> điểm</span>
                   </div>
                   <?php endfor; ?>
                </div>

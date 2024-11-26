@@ -222,5 +222,15 @@ foreach ($chuongBaiHocList as $row) {
       </div>
       <!-- Main End -->
       <?php include '../includes/footer.php'; ?>
+      <!-- Footer Scripts -->
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+      <script>
+         $(document).ready(function() {
+            // Đảm bảo dropdown hoạt động với Bootstrap
+            $('.dropdown-toggle').dropdown();
+         });
+      </script>
    </body>
 </html>
