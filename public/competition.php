@@ -37,12 +37,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Tính điểm
         foreach ($cauHoiList as $cauHoi) {
             if ($dapAnHocsinh[$cauHoi['MaCauHoi']] === $cauHoi['DapAnDung']) {
-                $diem ++; 
+                $diem++; 
             }
         }
 
         // Đặt biến để không hiển thị câu hỏi nữa
         $showQuiz = false;
+
+        // Lưu kết quả vào bảng ketqua
+        $maNguoiDung = $_SESSION['MaNguoiDung'];
+        $ngayThi = date('Y-m-d H:i:s');
+        $startTime = strtotime($_SESSION['startTime']);
+        $endTime = strtotime($ngayThi);
+        $thoiGianThi = $endTime - $startTime; // Tính thời gian thi (giây)
+
+        $sql = "INSERT INTO ketqua (MaNguoiDung, Diem, ThoiGianThi, NgayThi) VALUES (?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$maNguoiDung, $diem, $thoiGianThi, $ngayThi]);
     } else {
         // Nếu không có dữ liệu câu hỏi, có thể là lỗi trong việc gửi biểu mẫu
         $showQuiz = false;
@@ -57,87 +68,71 @@ if ($showQuiz) {
     $cauHoiList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Nhận thời gian bắt đầu (giả sử đây là thời điểm gửi form)
-$startTime = strtotime($_SESSION['startTime']); // Timestamp chuẩn từ múi giờ
-$endTime = strtotime($ngayThi);
-$thoiGianThi = strtotime($endTime) - strtotime($startTime); // Tính thời gian thi (giây)
-//$thoiGianThiFormatted = gmdate("H:i:s", $thoiGianThi); // Định dạng "giờ:phút:giây"
-
-$sql = "INSERT INTO ketquakiemtra (MaNguoiDung, Diem, ThoiGianThi, NgayThi)
-            VALUES (?, ?, ?, ?)";
-$stmt = $conn->prepare($sql);
-$stmt->execute([$maNguoiDung, $diem, $thoiGianThi, $ngayThi]);
-
-
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Thi đấu</title>
-
     <?php include '../includes/styles.php'; ?>
     <style>
-    .quiz-header {
-        background: linear-gradient(45deg, #FF512F, #DD2476);
-        border-radius: 15px;
-        padding: 30px;
-        margin-bottom: 30px;
-        color: white;
-    }
+        .quiz-header {
+            background: linear-gradient(45deg, #FF512F, #DD2476);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            color: white;
+        }
 
-    .progress-container {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-        padding: 15px;
-        margin-top: 20px;
-    }
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
 
-    .question-card {
-        transition: transform 0.2s;
-        margin-bottom: 20px;
-    }
+        .question-card {
+            transition: transform 0.2s;
+            margin-bottom: 20px;
+        }
 
-    .question-card:hover {
-        transform: translateY(-3px);
-    }
+        .question-card:hover {
+            transform: translateY(-3px);
+        }
 
-    .answer-option {
-        transition: all 0.3s;
-    }
+        .answer-option {
+            transition: all 0.3s;
+        }
 
-    .answer-option:hover {
-        background-color: #f8f9fa;
-    }
+        .answer-option:hover {
+            background-color: #f8f9fa;
+        }
 
-    .result-card {
-        background: linear-gradient(145deg, #ffffff, #f5f5f5);
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
+        .result-card {
+            background: linear-gradient(145deg, #ffffff, #f5f5f5);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
 
-    .score-circle {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto;
-        background: linear-gradient(45deg, #FF512F, #DD2476);
-        color: white;
-        font-size: 2.5rem;
-        font-weight: bold;
-        box-shadow: 0 5px 15px rgba(221, 36, 118, 0.3);
-    }
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            background: linear-gradient(45deg, #FF512F, #DD2476);
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(221, 36, 118, 0.3);
+        }
     </style>
-
 </head>
-
 <body>
     <?php include '../includes/navbar.php'; ?>
 
@@ -190,14 +185,10 @@ $stmt->execute([$maNguoiDung, $diem, $thoiGianThi, $ngayThi]);
                                         ];
                                         foreach ($options as $key => $value):
                                         ?>
-                                <label
-                                    class="list-group-item list-group-item-action answer-option d-flex align-items-center">
+                                <label class="list-group-item list-group-item-action answer-option d-flex align-items-center">
                                     <div class="custom-control custom-radio">
-                                        <input type="radio" id="q<?= $cauHoi['MaCauHoi'] ?>_<?= $key ?>"
-                                            name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="<?= $key ?>"
-                                            class="custom-control-input">
-                                        <span class="custom-control-label"><?= $key ?>.
-                                            <?= htmlspecialchars($value); ?></span>
+                                        <input type="radio" id="q<?= $cauHoi['MaCauHoi'] ?>_<?= $key ?>" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="<?= $key ?>" class="custom-control-input">
+                                        <span class="custom-control-label"><?= $key ?>. <?= htmlspecialchars($value); ?></span>
                                     </div>
                                 </label>
                                 <?php endforeach; ?>
@@ -210,7 +201,6 @@ $stmt->execute([$maNguoiDung, $diem, $thoiGianThi, $ngayThi]);
                     <button type="submit" class="btn btn-primary btn-lg btn-block mb-5">
                         <i class="fas fa-paper-plane mr-2"></i>Nộp Bài
                     </button>
-                    <input type="hidden" id="startTime" name="startTime" value="<?= time(); ?>">
 
                 </div>
 
@@ -222,8 +212,7 @@ $stmt->execute([$maNguoiDung, $diem, $thoiGianThi, $ngayThi]);
                         </div>
                         <div class="card-body">
                             <div class="progress mb-3" style="height: 20px;">
-                                <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated"
-                                    role="progressbar" style="width: 0%;">0%</div>
+                                <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;">0%</div>
                             </div>
                             <div class="d-flex justify-content-between text-muted">
                                 <small>Đã trả lời: <span id="answeredCount">0</span>/40</small>
@@ -254,111 +243,47 @@ $stmt->execute([$maNguoiDung, $diem, $thoiGianThi, $ngayThi]);
                     <div class="col-md-4">
                         <div class="card bg-light">
                             <div class="card-body">
-                                <h5 class="card-title text-success">Câu đúng</h5>
-                                <p class="card-text h2"><?= $diem ?></p>
+                                <h5 class="card-title">Điểm số</h5>
+                                <p class="card-text"><?= $diem; ?>/40</p>
                             </div>
                         </div>
                     </div>
+
                     <div class="col-md-4">
                         <div class="card bg-light">
                             <div class="card-body">
-                                <h5 class="card-title text-danger">Câu sai</h5>
-                                <p class="card-text h2"><?= 40 - $diem ?></p>
+                                <h5 class="card-title">Thời gian thi</h5>
+                                <p class="card-text"><?= gmdate("i:s", $thoiGianThi); ?></p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <a href="video_lessons.php" class="btn btn-primary btn-lg">
-                    <i class="fas fa-arrow-left mr-2"></i>Trở Về Bài Học
-                </a>
+                <a href="trangchu.php" class="btn btn-primary">Trở về trang chủ</a>
             </div>
         </div>
         <?php endif; ?>
     </div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Update progress when radio buttons are clicked
-        const radioButtons = document.querySelectorAll('input[type="radio"]');
-        const progressBar = document.getElementById('progressBar');
-        const answeredCount = document.getElementById('answeredCount');
-        const remainingCount = document.getElementById('remainingCount');
+        // Timer countdown functionality (optional)
+        const countdownElement = document.getElementById('countdown');
+        const totalTime = 45 * 60; // Total time in seconds (45 minutes)
 
-        function updateProgress() {
-            const totalQuestions = 40;
-            const answered = new Set(Array.from(document.querySelectorAll('input[type="radio"]:checked')).map(
-                input =>
-                input.name)).size;
-            const progress = (answered / totalQuestions) * 100;
+        let timeRemaining = totalTime;
 
-            progressBar.style.width = progress + '%';
-            progressBar.textContent = Math.round(progress) + '%';
-            answeredCount.textContent = answered;
-            remainingCount.textContent = totalQuestions - answered;
+        function updateCountdown() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            countdownElement.innerText = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+            timeRemaining--;
+            if (timeRemaining < 0) {
+                clearInterval(countdownInterval);
+                document.querySelector('form').submit(); // Auto-submit when time is up
+            }
         }
 
-        radioButtons.forEach(radio => {
-            radio.addEventListener('change', updateProgress);
-        });
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const countdownDisplay = document.getElementById('countdown'); // Phần tử hiển thị thời gian
-        const totalTime = 45 * 60; // 45 phút = 2700 giây
-        let remainingTime = totalTime;
-
-        // Đếm ngược thời gian
-        const countdown = setInterval(function() {
-            // Tính số phút và giây còn lại
-            let minutes = Math.floor(remainingTime / 60);
-            let seconds = remainingTime % 60;
-
-            // Đảm bảo hiển thị 2 chữ số
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-            seconds = seconds < 10 ? '0' + seconds : seconds;
-
-            // Cập nhật hiển thị thời gian còn lại
-            countdownDisplay.textContent = `${minutes}:${seconds}`;
-
-            // Giảm số giây còn lại
-            remainingTime--;
-
-            // Khi hết thời gian
-            if (remainingTime < 0) {
-                clearInterval(countdown);
-
-                // Sử dụng SweetAlert2 để hiển thị thông báo đẹp
-                Swal.fire({
-                    title: 'Thời gian đã hết!',
-                    text: 'Bài thi sẽ tự động nộp.',
-                    icon: 'warning',
-                    confirmButtonText: 'OK',
-                    showCloseButton: true,
-                    timer: 5000, // Đóng thông báo sau 5 giây (có thể bỏ nếu muốn người dùng nhấn OK)
-                    customClass: {
-                        popup: 'alert-popup',
-                        title: 'alert-title',
-                        content: 'alert-content'
-                    }
-                }).then(() => {
-                    document.querySelector('form').submit(); // Tự động nộp bài
-                });
-            }
-        }, 1000); // Cập nhật mỗi giây
-    });
-    </script>
-
-    <?php include '../includes/footer.php'; ?>
-
-    <!-- Back to Top -->
-    <a href="#" class="btn btn-primary p-3 back-to-top"><i class="fa-solid fa-up-long"></i></a>
-
-    <?php include '../includes/scripts.php'; ?>
-    <script src="../assets/js/main.js"></script>
-    <script type="text/javascript" async
-        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+        const countdownInterval = setInterval(updateCountdown, 1000);
     </script>
 </body>
-
 </html>

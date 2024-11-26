@@ -12,13 +12,13 @@ include '../database/db.php';
 $currentOrder = isset($_GET['order']) ? (int)$_GET['order'] : 1;
 
 // Lấy bài tập theo thứ tự
-$stmt = $conn->prepare("SELECT * FROM baitapkeoso WHERE ThuTu = :thutu");
+$stmt = $conn->prepare("SELECT * FROM cauhoiontap WHERE ThuTu = :thutu");
 $stmt->bindParam(':thutu', $currentOrder);
 $stmt->execute();
 $baitap = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Lấy tổng số bài tập
-$stmt = $conn->prepare("SELECT COUNT(*) as total FROM baitapkeoso");
+$stmt = $conn->prepare("SELECT COUNT(*) as total FROM cauhoiontap");
 $stmt->execute();
 $totalExercises = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 

@@ -28,7 +28,7 @@ if (isset($_SESSION['MaNguoiDung'])) {
 <div class="container-fluid position-relative shadow" style="background: linear-gradient(135deg, #e0f7ff 0%, #fff0f9 100%);">
     <nav class="navbar navbar-expand-lg navbar-light py-3 py-lg-0 px-0 px-lg-5">
         <a href="../public/" class="navbar-brand font-weight-bold" style="font-size: 28px;">
-            <span style="background: linear-gradient(45deg, #4a90e2, #9b51e0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ToanLop5.vn</span>
+            <span style="background: linear-gradient(45deg, #4a90e2, #9b51e0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">TOAN5.VN</span>
         </a>
         <button type="button" class="navbar-toggler rounded-circle" data-toggle="collapse" data-target="#navbarCollapse">
             <span class="navbar-toggler-icon"></span>
@@ -41,6 +41,8 @@ if (isset($_SESSION['MaNguoiDung'])) {
                     <i class="fa-solid fa-graduation-cap mr-2"></i>Vào học</a>
                 <a href="../public/rankings.php" class="nav-item nav-link rounded-pill px-4 mx-1 hover-scale">
                     <i class="fa-solid fa-ranking-star mr-2"></i>Xếp hạng</a>
+                <a href="../public/learning_progress.php" class="nav-item nav-link rounded-pill px-4 mx-1 hover-scale">
+                <i class="fa-solid fa-arrow-trend-up mr-2"></i>Tiến độ</a>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle rounded-pill px-4 mx-1 hover-scale" data-toggle="dropdown">
                         <i class="fas fa-pencil-alt mr-2"></i>Làm bài tập</a>

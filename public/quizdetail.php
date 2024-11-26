@@ -42,7 +42,7 @@ try {
     // Lấy tiến độ làm bài của người dùng
     $stmt = $conn->prepare("
         SELECT MaCauHoi, CauTraLoi, ThoiGianLam
-        FROM tiendoquiz
+        FROM tiendohoctap
         WHERE MaNguoiDung = :maNguoiDung 
         AND MaBaiHoc = :maBaiHoc
     ");
@@ -348,7 +348,7 @@ try {
             const timeSpent = (now - startTime) / 60000;
 
             try {
-                const response = await fetch('save_progresss.php', {
+                const response = await fetch('save_progress.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
