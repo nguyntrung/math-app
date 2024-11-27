@@ -303,7 +303,7 @@ if ($exerciseType == 2) {
     <?php include '../includes/scripts.php'; ?>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
         const draggables = document.querySelectorAll('.draggable-number');
         const dropzones = document.querySelectorAll('.dropzone');
         const exerciseType = <?php echo $exerciseType; ?>;
@@ -320,21 +320,6 @@ if ($exerciseType == 2) {
                 draggable.classList.add('dragging');
                 e.dataTransfer.setData('text/plain', draggable.textContent.trim());
                 e.dataTransfer.setData('text/html', draggable.outerHTML);
-
-                // Nếu số đang ở trong dropzone, xóa nó khỏi dropzone
-                if (draggable.parentElement.classList.contains('dropzone')) {
-                    setTimeout(() => {
-                        draggable.parentElement.classList.remove('filled');
-                        draggable.remove();
-                        // Hiện lại số gốc tương ứng
-                        const value = draggable.dataset.value;
-                        const originalNumber = document.querySelector(
-                            `.original-number[data-value="${value}"]`);
-                        if (originalNumber) {
-                            originalNumber.style.display = 'flex';
-                        }
-                    }, 0);
-                }
             });
 
             draggable.addEventListener('dragend', function() {
@@ -355,11 +340,7 @@ if ($exerciseType == 2) {
             dropzone.addEventListener('drop', function(e) {
                 e.preventDefault();
                 dropzone.classList.remove('drag-over');
-
-                // Nếu dropzone đã có số, không cho thả thêm
-                if (dropzone.hasChildNodes()) {
-                    return;
-                }
+                if (dropzone.hasChildNodes()) return; // Nếu đã có số, không cho thả thêm
 
                 const html = e.dataTransfer.getData('text/html');
                 const tempDiv = document.createElement('div');
@@ -368,33 +349,46 @@ if ($exerciseType == 2) {
                 const value = draggedElement.dataset.value;
 
                 // Ẩn số gốc tương ứng
-                const originalNumber = document.querySelector(
-                    `.original-number[data-value="${value}"]`);
-                if (originalNumber) {
-                    originalNumber.style.display = 'none';
-                }
+                const originalNumber = document.querySelector(`.original-number[data-value="${value}"]`);
+                if (originalNumber) originalNumber.style.display = 'none';
 
                 dropzone.innerHTML = html;
                 dropzone.classList.add('filled');
+            });
+        });
 
-                // Khôi phục lại các sự kiện cho số được thả
-                const newDraggable = dropzone.querySelector('.draggable-number');
-                if (newDraggable) {
-                    newDraggable.addEventListener('dragstart', function(e) {
-                        e.dataTransfer.setData('text/plain', this.textContent.trim());
-                        e.dataTransfer.setData('text/html', this.outerHTML);
-                        setTimeout(() => {
-                            dropzone.classList.remove('filled');
-                            this.remove();
-                            // Hiện lại số gốc khi kéo ra khỏi dropzone
-                            const value = this.dataset.value;
-                            const originalNumber = document.querySelector(
-                                `.original-number[data-value="${value}"]`);
-                            if (originalNumber) {
-                                originalNumber.style.display = 'flex';
-                            }
-                        }, 0);
-                    });
+        const pairs = {};
+
+        // Nối cột: Xử lý kéo và thả
+        document.querySelectorAll('.list-group-item[draggable="true"]').forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('text/plain', e.target.dataset.id);
+            });
+        });
+
+        dropzones.forEach(zone => {
+            zone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                zone.classList.add('drag-over');
+            });
+
+            zone.addEventListener('dragleave', function() {
+                zone.classList.remove('drag-over');
+            });
+
+            zone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+
+                const sourceId = e.dataTransfer.getData('text/plain');
+                if (zone.classList.contains('filled')) return; // Không cho thả thêm nếu đã có đáp án
+
+                const draggedItem = document.querySelector(`.list-group-item[data-id="${sourceId}"]`);
+                if (draggedItem) {
+                    zone.textContent = draggedItem.textContent;
+                    zone.classList.add('filled');
+                    draggedItem.style.display = 'none';
+                    pairs[sourceId] = zone.dataset.id;
                 }
             });
         });
@@ -404,75 +398,78 @@ if ($exerciseType == 2) {
             if (isAnswerCorrect) return;
 
             const filledDropzones = document.querySelectorAll('.dropzone.filled');
+            const notification = document.getElementById('notification');
+            let isCorrect = true;
 
-            if (exerciseType === 0) { // Math exercise
+            // Kiểm tra nếu các dropzone chưa được điền
+            if (filledDropzones.length < dropzones.length) {
+                notification.textContent = 'Hãy điền đầy đủ dữ liệu vào các ô nhé! 😊';
+                return;
+            }
+
+            // Nếu đã điền đủ dữ liệu, kiểm tra đáp án
+            if (exerciseType === 0) { // Bài tập toán học
                 if (filledDropzones.length === 2) {
                     const num1 = parseFloat(filledDropzones[0].textContent);
                     const num2 = parseFloat(filledDropzones[1].textContent);
                     const targetResult = <?php echo $baitap['KetQua']; ?>;
                     const operator = '<?php echo $baitap['PhepToan']; ?>';
 
-                    let isCorrect = false;
-                    if (operator === '+') {
-                        isCorrect = (num1 + num2 === targetResult);
-                    } else if (operator === '-') {
-                        isCorrect = (num1 - num2 === targetResult);
-                    } else if (operator === '×') {
-                        isCorrect = (num1 * num2 === targetResult);
-                    } else if (operator === '/') {
-                        isCorrect = (num2 !== 0 && num1 / num2 === targetResult);
-                    }
-
-                    handleAnswer(isCorrect, filledDropzones);
+                    if (operator === '+') isCorrect = (num1 + num2 === targetResult);
+                    else if (operator === '-') isCorrect = (num1 - num2 === targetResult);
+                    else if (operator === '×') isCorrect = (num1 * num2 === targetResult);
+                    else if (operator === '/') isCorrect = (num2 !== 0 && num1 / num2 === targetResult);
                 } else {
                     notification.textContent = 'Hãy điền đầy đủ hai số vào ô trống nhé! 😊';
                 }
-            } else { // Sorting exercise
+            } else if (exerciseType === 1) { // Bài tập sắp xếp
                 if (filledDropzones.length === 5) {
                     const currentNumbers = Array.from(filledDropzones).map(zone =>
                         parseInt(zone.querySelector('.draggable-number').dataset.value)
                     );
-
-                    const isCorrect = currentNumbers.every((num, index) =>
+                    isCorrect = currentNumbers.every((num, index) =>
                         num === parseInt(sortedNumbers[index])
                     );
-
-                    handleAnswer(isCorrect, filledDropzones);
                 } else {
                     notification.textContent = 'Hãy điền đầy đủ các số vào ô trống nhé! 😊';
                 }
+            } else if (exerciseType === 2) { // Nối cột
+                dropzones.forEach(zone => {
+                    const draggedId = Object.keys(pairs).find(key => pairs[key] === zone.dataset.id);
+                    if (!draggedId || draggedId !== zone.dataset.id) isCorrect = false;
+                });
             }
+
+            handleAnswer(isCorrect, filledDropzones);
         });
+
 
         function handleAnswer(isCorrect, dropzones) {
             const retryButton = document.getElementById('retryButton');
+            const notification = document.getElementById('notification');
 
             if (isCorrect) {
                 isAnswerCorrect = true;
-                confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: {
-                        y: 0.6
-                    }
-                });
-
-                // Phát âm thanh khi trả lời đúng
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
                 correctSound.play();
+                notification.textContent = 'Chúc mừng! Bạn đã trả lời đúng! 🎉';
 
-                dropzones.forEach(zone => {
-                    zone.classList.add('success-animation');
-                });
+                dropzones.forEach(zone => zone.classList.add('success-animation'));
 
                 const nextButton = document.getElementById('nextButton');
                 const finishButton = document.getElementById('finishButton');
-                if (nextButton) nextButton.style.display = 'block';
-                if (finishButton) finishButton.style.display = 'block';
 
-                notification.textContent = 'Chúc mừng! Bạn đã trả lời đúng! 🎉';
+                // Chỉ hiển thị nút "Hoàn thành bài học" khi đây là bài tập cuối cùng
+                if (<?php echo json_encode($isLastExercise); ?>) {
+                    nextButton.style.display = 'none'; // Ẩn nút Bài tiếp theo
+                    finishButton.style.display = 'block'; // Hiển thị nút Hoàn thành bài học
+                } else {
+                    nextButton.style.display = 'block'; // Hiển thị nút Bài tiếp theo
+                    finishButton.style.display = 'none'; // Ẩn nút Hoàn thành bài học
+                }
             } else {
-                // Phát âm thanh khi trả lời sai
                 wrongSound.play();
+                notification.textContent = 'Hãy thử lại nhé! 😊';
 
                 dropzones.forEach(zone => {
                     zone.classList.add('error-animation');
@@ -483,100 +480,14 @@ if ($exerciseType == 2) {
                     }, 500);
                 });
 
-                notification.textContent = 'Hãy thử lại nhé! 😊';
-                
-                // Hiển thị nút "Thử lại"
                 retryButton.style.display = 'block';
             }
         }
-        //Xử lý sự kiện nút "Thử Lại"       
+
+        // Xử lý sự kiện nút "Thử lại"       
         document.getElementById('retryButton').addEventListener('click', function () {
             window.location.reload();
         });
-
-
-        if (exerciseType === 2) { // Nối cột
-            const draggableItems = document.querySelectorAll('.list-group-item[draggable="true"]');
-            const dropZones = document.querySelectorAll('.dropzone');
-            const pairs = {};
-
-            draggableItems.forEach(item => {
-                item.addEventListener('dragstart', function(e) {
-                    e.dataTransfer.setData('text/plain', e.target.dataset.id);
-                });
-            });
-
-            dropZones.forEach(zone => {
-                zone.addEventListener('dragover', function(e) {
-                    e.preventDefault();
-                    zone.classList.add('drag-over');
-                });
-
-                zone.addEventListener('dragleave', function() {
-                    zone.classList.remove('drag-over');
-                });
-
-                zone.addEventListener('drop', function(e) {
-                    e.preventDefault();
-                    zone.classList.remove('drag-over');
-
-                    const sourceId = e.dataTransfer.getData('text/plain');
-                    const targetId = zone.dataset.id;
-
-                    // Nếu đã có một đáp án ở dropzone, không cho thả thêm
-                    if (zone.classList.contains('filled')) return;
-
-                    // Lấy nội dung của câu hỏi
-                    const draggedItem = document.querySelector(
-                        `.list-group-item[data-id="${sourceId}"]`);
-                    if (draggedItem) {
-                        zone.textContent = draggedItem.textContent;
-                        zone.classList.add('filled');
-                        draggedItem.style.display = 'none';
-
-                        // Lưu cặp nối
-                        pairs[sourceId] = targetId;
-                    }
-                });
-            });
-
-            // Nối cột: Kiểm tra đáp án
-            document.getElementById('checkAnswer').addEventListener('click', function() {
-                const notification = document.getElementById('notification');
-                let isCorrect = true;
-
-                // Duyệt qua tất cả các dropzone
-                dropZones.forEach(zone => {
-                    const draggedId = Object.keys(pairs).find(key => pairs[key] === zone.dataset
-                        .id);
-
-                    // Nếu không tìm thấy cặp đúng hoặc cặp không khớp, đánh dấu sai
-                    if (!draggedId || draggedId !== zone.dataset.id) {
-                        isCorrect = false;
-                    }
-                });
-
-                // Hiển thị kết quả
-                if (isCorrect) {
-                    confetti({
-                        particleCount: 100,
-                        spread: 70,
-                        origin: {
-                            y: 0.6
-                        }
-                    });
-                    correctSound.play();
-                    notification.textContent = 'Chúc mừng! Bạn đã nối đúng! 🎉';
-                    document.getElementById('nextButton').style.display = 'block';
-                } else {
-                    wrongSound.play();
-                    notification.textContent = 'Bạn đã nối sai. Thử lại nhé! 😊';
-                    
-                    // Hiển thị nút "Thử lại"
-                    retryButton.style.display = 'block';
-                }
-            });
-        }
     });
     </script>
 </body>
