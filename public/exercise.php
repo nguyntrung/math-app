@@ -184,17 +184,11 @@ if ($exerciseType == 2) {
 
                     <?php if ($exerciseType == 0): // Bài tập phép toán ?>
                     <div id="math-exercise">
-                        <h5 style="color: #4a90e2;">Hãy kéo 2 số vào ô trống sao cho kết quả bằng
-                            <?php echo htmlspecialchars($baitap['KetQua']); ?>!</h5>
-                        <div class="math-problem d-flex justify-content-center align-items-center my-4"
-                            style="font-size: 2rem;">
-                            <div class="dropzone mx-2"
-                                style="width: 60px; height: 60px; border: 3px dashed #ffd700; border-radius: 10px;">
-                            </div>
+                        <h5 style="color: #4a90e2;">Hãy kéo 2 số vào ô trống sao cho kết quả bằng <?php echo htmlspecialchars($baitap['KetQua']); ?>!</h5>
+                        <div class="math-problem d-flex justify-content-center align-items-center my-4" style="font-size: 2rem;">
+                            <div class="dropzone mx-2" style="width: 60px; height: 60px; border: 3px dashed #ffd700; border-radius: 10px;"></div>
                             <span class="mx-2"><?php echo htmlspecialchars($baitap['PhepToan']); ?></span>
-                            <div class="dropzone mx-2"
-                                style="width: 60px; height: 60px; border: 3px dashed #ffd700; border-radius: 10px;">
-                            </div>
+                            <div class="dropzone mx-2" style="width: 60px; height: 60px; border: 3px dashed #ffd700; border-radius: 10px;"></div>
                             <span class="mx-2">=</span>
                             <span><?php echo htmlspecialchars($baitap['KetQua']); ?></span>
                         </div>
@@ -242,7 +236,6 @@ if ($exerciseType == 2) {
                     <?php endif; ?>
                 </div>
 
-
                 <!-- Hiển thị dãy số chỉ khi không phải bài tập nối cột -->
                 <?php if ($exerciseType != 2): ?>
                 <div class="numbers-container d-flex justify-content-center flex-wrap"
@@ -276,6 +269,10 @@ if ($exerciseType == 2) {
                         style="background-color: #ff6347; border: none;">
                         Kiểm tra đáp án
                     </button>
+
+                    <div id="retryButton" style="display: none;">
+                        <button class="btn btn-warning btn-lg">Thử lại</button>
+                    </div>
 
                     <?php if (!$isLastExercise): ?>
                     <div id="nextButton" style="display: none;">
@@ -448,6 +445,8 @@ if ($exerciseType == 2) {
         });
 
         function handleAnswer(isCorrect, dropzones) {
+            const retryButton = document.getElementById('retryButton');
+
             if (isCorrect) {
                 isAnswerCorrect = true;
                 confetti({
@@ -485,8 +484,16 @@ if ($exerciseType == 2) {
                 });
 
                 notification.textContent = 'Hãy thử lại nhé! 😊';
+                
+                // Hiển thị nút "Thử lại"
+                retryButton.style.display = 'block';
             }
         }
+        //Xử lý sự kiện nút "Thử Lại"       
+        document.getElementById('retryButton').addEventListener('click', function () {
+            window.location.reload();
+        });
+
 
         if (exerciseType === 2) { // Nối cột
             const draggableItems = document.querySelectorAll('.list-group-item[draggable="true"]');
@@ -564,6 +571,9 @@ if ($exerciseType == 2) {
                 } else {
                     wrongSound.play();
                     notification.textContent = 'Bạn đã nối sai. Thử lại nhé! 😊';
+                    
+                    // Hiển thị nút "Thử lại"
+                    retryButton.style.display = 'block';
                 }
             });
         }
