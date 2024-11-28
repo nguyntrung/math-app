@@ -42,21 +42,17 @@ if (isset($_SESSION['MaNguoiDung'])) {
                 <a href="../public/rankings.php" class="nav-item nav-link rounded-pill px-4 mx-1 hover-scale">
                     <i class="fa-solid fa-ranking-star mr-2"></i>Xếp hạng</a>
                 <a href="../public/learning_progress.php" class="nav-item nav-link rounded-pill px-4 mx-1 hover-scale">
-                <i class="fa-solid fa-arrow-trend-up mr-2"></i>Tiến độ</a>
+                    <i class="fa-solid fa-arrow-trend-up mr-2"></i>Tiến độ</a>
+                <a href="../public/competition.php" class="nav-item nav-link rounded-pill px-4 mx-1 hover-scale">
+                    <i class="fa-solid fa-trophy mr-2"></i>Thi đấu</a>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle rounded-pill px-4 mx-1 hover-scale" data-toggle="dropdown">
-                        <i class="fas fa-pencil-alt mr-2"></i>Làm bài tập</a>
+                        <i class="fas fa-pencil-alt mr-2"></i>Bài tập</a>
                     <div class="dropdown-menu rounded-lg border-0 shadow-lg">
-                        <a href="../public/essay.php" class="dropdown-item py-2 px-4 hover-scale">
-                            <i class="fas fa-edit mr-2"></i>Bài tập tự luận</a>
-                        <a href="../public/quiz.php" class="dropdown-item py-2 px-4 hover-scale">
-                            <i class="fas fa-check-circle mr-2"></i>Trắc nghiệm vui</a>
                         <a href="../public/solutions.php" class="dropdown-item py-2 px-4 hover-scale">
                             <i class="fas fa-book mr-2"></i>Giải bài tập SGK</a>
                         <a href="../public/quiz_check.php" class="dropdown-item py-2 px-4 hover-scale">
                             <i class="fas fa-clock mr-2"></i>Kiểm tra</a>
-                        <a href="../public/competition.php" class="dropdown-item py-2 px-4 hover-scale">
-                            <i class="fa-solid fa-trophy mr-2"></i>Thi đấu</a>
                         <a href="../public/exercise.php" class="dropdown-item py-2 px-4 hover-scale">
                             <i class="fas fa-redo mr-2"></i>Ôn tập</a>
                     </div>
@@ -146,7 +142,7 @@ if (isset($_SESSION['MaNguoiDung'])) {
                             <i class="fas fa-graduation-cap me-2" style="color: #e46356"></i>Khóa học của bạn</a>
                         <a href="edit_profile.php" class="dropdown-item py-2 px-4 hover-scale">
                             <i class="fas fa-key me-2" style="color: #6587ff"></i>Đổi mật khẩu</a>
-                        <a href="logout.php" class="dropdown-item py-2 px-4 hover-scale">
+                        <a href="#" id="logoutButton" class="dropdown-item py-2 px-4 hover-scale">
                             <i class="fas fa-sign-out-alt me-2" style="color: #687187"></i>Đăng xuất</a>
                     </div>
                 </div>
@@ -158,6 +154,29 @@ if (isset($_SESSION['MaNguoiDung'])) {
     </nav>
 </div>
 <!-- Navbar End -->
+
+<script>
+    // Thêm vào sự kiện đăng xuất
+    document.getElementById('logoutButton').addEventListener('click', function (event) {
+        event.preventDefault(); // Ngăn không cho chuyển trang ngay lập tức
+
+        Swal.fire({
+            title: 'Bạn có chắc chắn muốn đăng xuất?',
+            text: "Bạn sẽ bị đăng xuất khỏi tài khoản của mình.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Đăng xuất',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Nếu người dùng xác nhận đăng xuất, chuyển hướng đến trang đăng xuất
+                window.location.href = 'logout.php';
+            }
+        });
+    });
+</script>
 
 <style>
     /* Thêm vào phần CSS của bạn */

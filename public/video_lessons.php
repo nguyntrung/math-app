@@ -66,6 +66,7 @@ try {
 
     <?php include '../includes/styles.php'; ?>
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         :root {
             --primary-color: #4CAF50;
@@ -188,6 +189,34 @@ try {
             margin-bottom: 10px;
         }
 
+        .action-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            color: white;
+            margin: 0 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .video-button {
+            background-color: #b67ddb;
+        }
+
+        .theory-button {
+            background-color: #55c57a;
+        }
+
+        .action-button:hover {
+            opacity: 0.9;
+            text-decoration: none;
+            color: white;
+        }
+
         .progress-stats {
             display: flex;
             gap: 20px;
@@ -306,6 +335,111 @@ try {
             background: #4CAF50;
             color: white;
         }
+
+        /* Mobile and Tablet Responsive Adjustments */
+        @media screen and (max-width: 1200px) {
+            .learning-container {
+                padding: 20px 50px;
+            }
+        }
+
+        @media screen and (max-width: 992px) {
+            .learning-container {
+                flex-direction: column;
+                padding: 20px;
+            }
+
+            .chapters-sidebar {
+                flex: 0 0 100%;
+                margin-bottom: 20px;
+            }
+
+            .lessons-content {
+                width: 100%;
+            }
+
+            .lessons-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .progress-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .progress-stats {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .progress-legend {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .progress-legend span {
+                margin-right: 10px;
+                margin-bottom: 5px;
+            }
+
+            .lessons-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chapter-search {
+                font-size: 16px; /* Prevent zoom on mobile */
+            }
+        }
+
+        @media screen and (max-width: 576px) {
+            .learning-container {
+                padding: 10px;
+            }
+
+            .lesson-card .lesson-actions {
+                gap: 5px;
+            }
+
+            .lesson-actions a {
+                width: 100%;
+                text-align: center;
+                padding: 10px;
+            }
+            .lessons-grid.two-columns {
+                grid-template-columns: repeat(1, 1fr);
+            }
+        }
+
+        /* Additional Responsive Adjustments */
+        .learning-container {
+            max-width: 1000px;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Ensure images are responsive */
+        .lesson-image img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        /* Improve touch targets for mobile */
+        @media (max-width: 768px) {
+            .chapter-item, 
+            .lesson-actions a {
+                min-height: 50px;
+                display: flex;
+                align-items: center;
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 
@@ -371,6 +505,7 @@ try {
 
     <?php include '../includes/footer.php'; ?>
     <?php include '../includes/scripts.php'; ?>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
     function handleChapterClick(maChuong, mienPhi, isActiveMember) {
         // Nếu là chương miễn phí (chương 1) thì cho phép truy cập
@@ -381,7 +516,24 @@ try {
         
         // Nếu không phải chương miễn phí và không phải thành viên active
         if (!isActiveMember) {
-            window.location.href = 'registermember.php';
+            // window.location.href = 'registermember.php';
+            // return;
+            // Hiển thị popup xác nhận
+            Swal.fire({
+                title: 'Đăng Ký Thành Viên',
+                text: 'Chương này yêu cầu bạn đăng ký thành viên. Bạn có muốn đăng ký không?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Đăng ký ngay',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Chuyển đến trang đăng ký thành viên
+                    window.location.href = 'registermember.php';
+                }
+            });
             return;
         }
         
@@ -421,6 +573,7 @@ try {
                     lessonsGrid.classList.remove('two-columns');
                 }
 
+                
                 // Generate lesson cards
                 lessonsGrid.innerHTML = data.lessons.map(lesson => `
                     <div class="lesson-card">
@@ -435,12 +588,20 @@ try {
                                     ${lesson.TenBai}
                                 </a>
                             </div>
-                            <div class="lesson-actions d-flex justify-content-between">
-                                <a href="video_lessons_detail.php?maBaiHoc=${lesson.MaBaiHoc}" class="d-flex flex-column align-items-center text-decoration-none fw-bold text-body-secondary">
-                                    <i class="fa-solid fa-video" style="color: #b67ddb"></i> Video
+                            <div class="lesson-actions d-flex justify-content-between align-items-center">
+                                <a href="video_lessons_detail.php?maBaiHoc=${lesson.MaBaiHoc}" class="action-button video-button flex-grow-1">
+                                    <i class="fa-solid fa-video"></i> Video
                                 </a>
-                                <a href="theory_lessons.php?maBaiHoc=${lesson.MaBaiHoc}" class="d-flex flex-column align-items-center text-decoration-none fw-bold text-body-secondary">
-                                    <i class="fa-solid fa-book-open" style="color: #55c57a"></i> Lý thuyết
+                                <a href="theory_lessons.php?maBaiHoc=${lesson.MaBaiHoc}" class="action-button theory-button flex-grow-1">
+                                    <i class="fa-solid fa-book-open"></i> Lý thuyết
+                                </a>
+                            </div>
+                            <div class="lesson-actions d-flex justify-content-between">
+                                <a href="quiz_detail.php?maBaiHoc=${lesson.MaBaiHoc}" class="d-flex flex-column align-items-center text-decoration-none fw-bold text-body-secondary">
+                                    <i class="fa-solid fa-circle-question" style="color: #b67ddb"></i> TNghiệm
+                                </a>
+                                <a href="essay_detail.php?maBaiHoc=${lesson.MaBaiHoc}" class="d-flex flex-column align-items-center text-decoration-none fw-bold text-body-secondary">
+                                    <i class="fas fa-edit" style="color: #55c57a"></i>Tự luận
                                 </a>
                                 <a href="quizdetail.php?maBaiHoc=${lesson.MaBaiHoc}" class="d-flex flex-column align-items-center text-decoration-none fw-bold text-body-secondary">
                                     <i class="fas fa-tasks" style="color: #8b8b8b"></i>
@@ -454,6 +615,33 @@ try {
                         </div>
                     </div>
                 `).join('');
+                
+                lessonsGrid.innerHTML += `
+                    <div class="lesson-card">
+                        <div class="lesson-image">
+                            <img src="../assets/img/toan5edu.png" alt="Lesson">
+                        </div>
+                        <div class="lesson-title p-2 mb-0">
+                            <p class="text-success m-0">
+                                ${data.chapterTitle} - Kiểm tra
+                            </p>
+                        </div>
+                        <div class="lesson-content">
+                            <div class="lesson-actions d-flex justify-content-between align-items-center mt-0">
+                                <a href="quiz_check.php?maChuong=${maChuong}" class="action-button theory-button">
+                                    <i class="fas fa-pencil-alt"></i> Làm bài kiểm tra
+                                </a>
+                            </div>
+                            <div class="text-center m-2">
+                                <a href="history.php" class="text-decoration-none fw-bold" style="color: #55c57a" 
+                                    onmouseover="this.style.color='#3e8e41'" 
+                                    onmouseout="this.style.color='#55c57a'">
+                                    Lịch sử kiểm tra
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
             });
     }
 
@@ -483,7 +671,19 @@ try {
         });
     });
 
+    // Add to existing script
+    function adjustMobileLayout() {
+        const isMobile = window.innerWidth <= 768;
+        const lessonsGrid = document.getElementById('lessonsGrid');
+        
+        if (isMobile) {
+            lessonsGrid.classList.remove('two-columns');
+        }
+    }
+
+    window.addEventListener('resize', adjustMobileLayout);
+    document.addEventListener('DOMContentLoaded', adjustMobileLayout);
+
     </script>
 </body>
-
 </html>
