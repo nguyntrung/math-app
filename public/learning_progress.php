@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Kiểm tra đăng nhập
+// Check login
 if (!isset($_SESSION['MaNguoiDung'])) {
     header('Location: login.php');
     exit();
@@ -9,15 +9,30 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 
 include '../database/db.php';
 
-// Lấy danh sách các chương, bài học, và tiến độ học tập từ cơ sở dữ liệu
+// Prepare a query to get the total number of questions for each lesson
+$stmtTotalQuestions = $conn->prepare("
+    SELECT 
+        MaBaiHoc, 
+        COUNT(MaCauHoi) AS TotalQuestions
+    FROM (
+        SELECT MaBaiHoc, MaCauHoi FROM cauhoitracnghiem
+        UNION
+        SELECT MaBaiHoc, MaCauHoi FROM cauhoituluan
+    ) AS AllQuestions
+    GROUP BY MaBaiHoc
+");
+$stmtTotalQuestions->execute();
+$totalQuestionsMap = $stmtTotalQuestions->fetchAll(PDO::FETCH_KEY_PAIR);
+
+// Modify the main query to include progress information
 $stmt = $conn->prepare("
     SELECT 
         chuonghoc.MaChuong, 
         chuonghoc.TenChuong, 
         baihoc.MaBaiHoc, 
         baihoc.TenBai, 
-        SUM(tiendohoctap.ThoiGianLam) AS TotalTimeSpent,  -- Sum of time spent on each question in the lesson
-        COUNT(tiendohoctap.MaCauHoi) AS AnsweredQuestions   -- Count the number of questions answered
+        SUM(tiendohoctap.ThoiGianLam) AS TotalTimeSpent,
+        COUNT(tiendohoctap.MaCauHoi) AS AnsweredQuestions
     FROM chuonghoc
     LEFT JOIN baihoc ON chuonghoc.MaChuong = baihoc.MaChuong
     LEFT JOIN tiendohoctap ON baihoc.MaBaiHoc = tiendohoctap.MaBaiHoc 
@@ -29,22 +44,25 @@ $stmt = $conn->prepare("
 $stmt->execute(['maNguoiDung' => $_SESSION['MaNguoiDung']]);
 $chuongBaiHocList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Tạo mảng để nhóm các bài học theo chương
+// Create an array to group lessons by chapter
 $chuongData = [];
 foreach ($chuongBaiHocList as $row) {
     $maChuong = $row['MaChuong'];
     $tenChuong = $row['TenChuong'];
     $maBaiHoc = $row['MaBaiHoc'];
     $tenBaiHoc = $row['TenBai'];
-    $totalTimeSpent = $row['TotalTimeSpent']; // Tổng thời gian bỏ ra cho bài học
-    $answeredQuestions = $row['AnsweredQuestions']; // Số câu hỏi đã trả lời
+    $totalTimeSpent = $row['TotalTimeSpent'];
+    $answeredQuestions = $row['AnsweredQuestions'];
 
-    // Tính toán thời gian bỏ ra và chuyển đổi sang phút và giây
+    // Calculate total questions for this lesson
+    $totalQuestions = isset($totalQuestionsMap[$maBaiHoc]) ? $totalQuestionsMap[$maBaiHoc] : 0;
+
+    // Format time spent
     $minutes = floor($totalTimeSpent);
     $seconds = round(($totalTimeSpent - $minutes) * 60);
     $timeFormatted = sprintf("%02d:%02d", $minutes, $seconds);
 
-    // Kiểm tra xem chương đã có chưa
+    // Check if chapter exists
     if (!isset($chuongData[$maChuong])) {
         $chuongData[$maChuong] = [
             'tenChuong' => $tenChuong,
@@ -52,16 +70,18 @@ foreach ($chuongBaiHocList as $row) {
         ];
     }
 
-    // Đánh dấu bài học hoàn thành nếu có câu hỏi đã trả lời
-    $isCompleted = $answeredQuestions > 0;
+    // Calculate score
+    $score = $totalQuestions > 0 ? round(($answeredQuestions / $totalQuestions) * 20, 1) : 0;
 
-    // Thêm bài học vào chương
+    // Add lesson to chapter
     $chuongData[$maChuong]['baiHocList'][] = [
         'maBaiHoc' => $maBaiHoc,
         'tenBaiHoc' => $tenBaiHoc,
         'timeSpent' => $timeFormatted,
         'answeredQuestions' => $answeredQuestions,
-        'isCompleted' => $isCompleted
+        'totalQuestions' => $totalQuestions,
+        'score' => $score,
+        'isCompleted' => $answeredQuestions > 0
     ];
 }
 ?>
@@ -205,8 +225,8 @@ foreach ($chuongBaiHocList as $row) {
                      </div>
                      <div class="lesson-item flex-1 text-center">
                         <div class="score-bar">
-                           <div class="score-fill" style="width: <?= $baiHoc['answeredQuestions'] > 0 ? '100' : '0' ?>%"></div>
-                           <span class="score-text"><?= $baiHoc['answeredQuestions'] > 0 ? '10' : '0' ?></span>
+                           <div class="score-fill" style="width: <?= ($baiHoc['score'] / 20) * 100 ?>%"></div>
+                           <span class="score-text"><?= $baiHoc['score'] ?></span>
                         </div>
                      </div>
                   </div>
