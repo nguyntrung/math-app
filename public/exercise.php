@@ -8,8 +8,21 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 
 include '../database/db.php';
 
+// Kiểm tra nếu thông tin bài tập không tồn tại trong session
+if (!isset($_SESSION['exerciseType']) || !isset($_SESSION['currentOrder'])) {
+    // Nếu không có, thiết lập lại các giá trị mặc định
+    $_SESSION['exerciseType'] = rand(0, 2);
+    $_SESSION['currentOrder'] = 1;
+} else {
+    // Nếu đang chuyển đến bài tập mới, thiết lập lại dạng bài tập
+    if (isset($_GET['order']) && (int)$_GET['order'] != $_SESSION['currentOrder']) {
+        $_SESSION['exerciseType'] = rand(0, 2); // Tạo dạng bài tập mới
+        $_SESSION['currentOrder'] = (int)$_GET['order']; // Cập nhật thứ tự hiện tại
+    }
+}
+
 // Lấy số thứ tự bài tập từ tham số URL, mặc định là 1
-$currentOrder = isset($_GET['order']) ? (int)$_GET['order'] : 1;
+$currentOrder = isset($_SESSION['currentOrder']) ? $_SESSION['currentOrder'] : (isset($_GET['order']) ? (int)$_GET['order'] : 1);
 
 // Lấy bài tập theo thứ tự
 $stmt = $conn->prepare("SELECT * FROM cauhoiontap WHERE ThuTu = :thutu");
@@ -23,14 +36,29 @@ $stmt->execute();
 $totalExercises = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
 // Nếu không còn bài tập tiếp theo
-$isLastExercise = $currentOrder >= $totalExercises;
+$isLastExercise = $currentOrder == $totalExercises;
 
 // Tạo mảng các số và xáo trộn
 $numbers = [$baitap['So1'], $baitap['So2'], $baitap['So3'], $baitap['So4'], $baitap['So5']];
 shuffle($numbers);
 
-// Quyết định ngẫu nhiên loại bài tập (0: phép toán, 1: sắp xếp, 2: nối cột)
-$exerciseType = rand(0, 2);
+// Kiểm tra xem có POST yêu cầu 'retry' không
+if (isset($_POST['retry'])) {
+    // Lưu thông tin bài tập vào session
+    $_SESSION['exerciseType'] = $_POST['exerciseType'];
+    $_SESSION['currentOrder'] = $_POST['currentOrder'];
+    header('Location: ' . $_SERVER['PHP_SELF']); // Tải lại trang hiện tại
+    exit();
+}
+
+// Kiểm tra và thiết lập lại các giá trị mặc định nếu chưa có trong session
+if (!isset($_SESSION['exerciseType']) || !isset($_SESSION['currentOrder'])) {
+    $_SESSION['exerciseType'] = rand(0, 2);
+    $_SESSION['currentOrder'] = 1;
+}
+
+// Lấy loại bài tập từ session
+$exerciseType = $_SESSION['exerciseType'];
 
 // Nếu là bài sắp xếp, sắp xếp lại mảng để có đáp án
 $sortedNumbers = $numbers;
@@ -207,61 +235,61 @@ if ($exerciseType == 2) {
                     <?php endif; ?>
 
                     <?php if ($exerciseType == 2): // Bài tập nối cột ?>
-                    <div id="matching-exercise">
-                        <h5 style="color: #4a90e2;">Hãy nối các câu hỏi ở cột trái với câu trả lời tương ứng ở cột phải!
-                        </h5>
-                        <div class="row">
-                            <!-- Cột câu hỏi -->
-                            <div class="col-md-6">
-                                <ul class="list-group">
-                                    <?php foreach ($leftItems as $item): ?>
-                                    <li class="list-group-item" draggable="true" data-id="<?php echo $item['id']; ?>">
-                                        <?php echo htmlspecialchars($item['question']); ?>
-                                    </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <ul class="list-group">
-                                    <?php foreach ($rightItems as $item): ?>
-                                    <li class="list-group-item dropzone" style="cursor: pointer; min-height: 40px;"
-                                        data-id="<?php echo $item['id']; ?>">
-                                        <?php echo htmlspecialchars($item['answer']); ?>
-                                    </li>
-                                    <?php endforeach; ?>
-                                </ul>
+                        <div id="matching-exercise">
+                            <h5 style="color: #4a90e2;">Hãy nối các câu hỏi ở cột trái với câu trả lời tương ứng ở cột phải!
+                            </h5>
+                            <div class="row">
+                                <!-- Cột câu hỏi -->
+                                <div class="col-md-6">
+                                    <ul class="list-group">
+                                        <?php foreach ($leftItems as $item): ?>
+                                        <li class="list-group-item" draggable="true" data-id="<?php echo $item['id']; ?>">
+                                            <?php echo htmlspecialchars($item['question']); ?>
+                                        </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="list-group">
+                                        <?php foreach ($rightItems as $item): ?>
+                                        <li class="list-group-item dropzone" style="cursor: pointer; min-height: 40px;"
+                                            data-id="<?php echo $item['id']; ?>">
+                                            <?php echo htmlspecialchars($item['answer']); ?>
+                                        </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     <?php endif; ?>
                 </div>
 
                 <!-- Hiển thị dãy số chỉ khi không phải bài tập nối cột -->
                 <?php if ($exerciseType != 2): ?>
-                <div class="numbers-container d-flex justify-content-center flex-wrap"
-                    style="gap: 20px; min-height: 70px;">
-                    <?php foreach ($numbers as $index => $number): ?>
-                    <div class="draggable-number d-flex justify-content-center align-items-center original-number"
-                        style="width: 50px; height: 50px; 
-                    background: linear-gradient(135deg, 
-                        <?php 
-                        $colors = [
-                            ['#ff9a9e', '#fad0c4'],
-                            ['#a1c4fd', '#c2e9fb'],
-                            ['#ffecd2', '#fcb69f'],
-                            ['#84fab0', '#8fd3f4'],
-                            ['#a6c1ee', '#fbc2eb']
-                        ];
-                        echo $colors[$index][0] . ' 0%, ' . $colors[$index][1] . ' 100%';
-                        ?>
-                    ); 
-                    border-radius: 10px; cursor: move; font-size: 1.5rem; color: white; 
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.1);" draggable="true"
-                        data-value="<?php echo htmlspecialchars($number); ?>">
-                        <?php echo htmlspecialchars($number); ?>
+                    <div class="numbers-container d-flex justify-content-center flex-wrap"
+                        style="gap: 20px; min-height: 70px;">
+                        <?php foreach ($numbers as $index => $number): ?>
+                        <div class="draggable-number d-flex justify-content-center align-items-center original-number"
+                            style="width: 50px; height: 50px; 
+                        background: linear-gradient(135deg, 
+                            <?php 
+                            $colors = [
+                                ['#ff9a9e', '#fad0c4'],
+                                ['#a1c4fd', '#c2e9fb'],
+                                ['#ffecd2', '#fcb69f'],
+                                ['#84fab0', '#8fd3f4'],
+                                ['#a6c1ee', '#fbc2eb']
+                            ];
+                            echo $colors[$index][0] . ' 0%, ' . $colors[$index][1] . ' 100%';
+                            ?>
+                        ); 
+                        border-radius: 10px; cursor: move; font-size: 1.5rem; color: white; 
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.1);" draggable="true"
+                            data-value="<?php echo htmlspecialchars($number); ?>">
+                            <?php echo htmlspecialchars($number); ?>
+                        </div>
+                        <?php endforeach; ?>
                     </div>
-                    <?php endforeach; ?>
-                </div>
                 <?php endif; ?>
 
                 <div class="feedback-area text-center mt-4">
@@ -281,13 +309,13 @@ if ($exerciseType == 2) {
                         </a>
                     </div>
                     <?php endif; ?>
-
+                    
                     <?php if ($isLastExercise): ?>
-                    <div id="finishButton" style="display: none;">
-                        <a href="theory_lessons.php" class="btn btn-primary btn-lg">
-                            Hoàn thành bài tập
-                        </a>
-                    </div>
+                        <div id="finishedButton" style="display: none;"> <!-- Ẩn mặc định -->
+                            <a href="theory_lessons.php" class="btn btn-primary btn-lg">
+                                Hoàn thành bài tập
+                            </a>
+                        </div>
                     <?php endif; ?>
                 </div>
 
@@ -304,62 +332,64 @@ if ($exerciseType == 2) {
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-        const draggables = document.querySelectorAll('.draggable-number');
-        const dropzones = document.querySelectorAll('.dropzone');
-        const exerciseType = <?php echo $exerciseType; ?>;
-        const sortedNumbers = <?php echo json_encode($sortedNumbers); ?>;
-        let isAnswerCorrect = false;
+    const draggables = document.querySelectorAll('.draggable-number');
+    const dropzones = document.querySelectorAll('.dropzone');
+    const exerciseType = <?php echo $exerciseType; ?>;
+    const sortedNumbers = <?php echo json_encode($sortedNumbers); ?>;
+    const targetResult = <?php echo $baitap['KetQua']; ?>;
+    const operator = '<?php echo $baitap['PhepToan']; ?>';
 
-        // Tạo đối tượng âm thanh
-        const correctSound = new Audio('../assets/sounds/correct.mp3');
-        const wrongSound = new Audio('../assets/sounds/wrong.mp3');
+    let isAnswerCorrect = false;
+    const correctSound = new Audio('../assets/sounds/correct.mp3');
+    const wrongSound = new Audio('../assets/sounds/wrong.mp3');
 
-        // Drag and drop handling
-        draggables.forEach(draggable => {
-            draggable.addEventListener('dragstart', function(e) {
-                draggable.classList.add('dragging');
-                e.dataTransfer.setData('text/plain', draggable.textContent.trim());
-                e.dataTransfer.setData('text/html', draggable.outerHTML);
-            });
+    let pairs = {}; // Lưu trữ kết quả nối cột
 
-            draggable.addEventListener('dragend', function() {
-                draggable.classList.remove('dragging');
-            });
+    // Drag and drop setup
+    draggables.forEach(draggable => {
+        draggable.addEventListener('dragstart', function(e) {
+            draggable.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', draggable.textContent.trim());
+            e.dataTransfer.setData('text/html', draggable.outerHTML);
         });
 
-        dropzones.forEach(dropzone => {
-            dropzone.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                dropzone.classList.add('drag-over');
-            });
+        draggable.addEventListener('dragend', function() {
+            draggable.classList.remove('dragging');
+        });
+    });
 
-            dropzone.addEventListener('dragleave', function() {
-                dropzone.classList.remove('drag-over');
-            });
-
-            dropzone.addEventListener('drop', function(e) {
-                e.preventDefault();
-                dropzone.classList.remove('drag-over');
-                if (dropzone.hasChildNodes()) return; // Nếu đã có số, không cho thả thêm
-
-                const html = e.dataTransfer.getData('text/html');
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = html;
-                const draggedElement = tempDiv.firstChild;
-                const value = draggedElement.dataset.value;
-
-                // Ẩn số gốc tương ứng
-                const originalNumber = document.querySelector(`.original-number[data-value="${value}"]`);
-                if (originalNumber) originalNumber.style.display = 'none';
-
-                dropzone.innerHTML = html;
-                dropzone.classList.add('filled');
-            });
+    dropzones.forEach(dropzone => {
+        dropzone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            dropzone.classList.add('drag-over');
         });
 
-        const pairs = {};
+        dropzone.addEventListener('dragleave', function() {
+            dropzone.classList.remove('drag-over');
+        });
 
-        // Nối cột: Xử lý kéo và thả
+        dropzone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            dropzone.classList.remove('drag-over');
+
+            if (dropzone.hasChildNodes()) return;
+
+            const html = e.dataTransfer.getData('text/html');
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            const draggedElement = tempDiv.firstChild;
+            const value = draggedElement.dataset.value;
+
+            const originalNumber = document.querySelector(`.original-number[data-value="${value}"]`);
+            if (originalNumber) originalNumber.style.display = 'none';
+
+            dropzone.innerHTML = html;
+            dropzone.classList.add('filled');
+        });
+    });
+
+    // Handling matching pairs drag and drop
+    if (exerciseType === 2) {
         document.querySelectorAll('.list-group-item[draggable="true"]').forEach(item => {
             item.addEventListener('dragstart', function(e) {
                 e.dataTransfer.setData('text/plain', e.target.dataset.id);
@@ -381,7 +411,7 @@ if ($exerciseType == 2) {
                 zone.classList.remove('drag-over');
 
                 const sourceId = e.dataTransfer.getData('text/plain');
-                if (zone.classList.contains('filled')) return; // Không cho thả thêm nếu đã có đáp án
+                if (zone.classList.contains('filled')) return;
 
                 const draggedItem = document.querySelector(`.list-group-item[data-id="${sourceId}"]`);
                 if (draggedItem) {
@@ -392,103 +422,111 @@ if ($exerciseType == 2) {
                 }
             });
         });
+    }
 
-        // Kiểm tra đáp án
-        document.getElementById('checkAnswer').addEventListener('click', function() {
-            if (isAnswerCorrect) return;
+    // Check answer logic
+    document.getElementById('checkAnswer').addEventListener('click', function() {
+        if (isAnswerCorrect) return;
 
-            const filledDropzones = document.querySelectorAll('.dropzone.filled');
-            const notification = document.getElementById('notification');
-            let isCorrect = true;
+        const filledDropzones = document.querySelectorAll('.dropzone.filled');
+        const notification = document.getElementById('notification');
+        const nextButton = document.getElementById('nextButton');
+        const finishedButton = document.getElementById('finishedButton');
+        const retryButton = document.getElementById('retryButton');
+        let isCorrect = true;
 
-            // Kiểm tra nếu các dropzone chưa được điền
-            if (filledDropzones.length < dropzones.length) {
-                notification.textContent = 'Hãy điền đầy đủ dữ liệu vào các ô nhé! 😊';
-                return;
-            }
-
-            // Nếu đã điền đủ dữ liệu, kiểm tra đáp án
-            if (exerciseType === 0) { // Bài tập toán học
-                if (filledDropzones.length === 2) {
-                    const num1 = parseFloat(filledDropzones[0].textContent);
-                    const num2 = parseFloat(filledDropzones[1].textContent);
-                    const targetResult = <?php echo $baitap['KetQua']; ?>;
-                    const operator = '<?php echo $baitap['PhepToan']; ?>';
-
-                    if (operator === '+') isCorrect = (num1 + num2 === targetResult);
-                    else if (operator === '-') isCorrect = (num1 - num2 === targetResult);
-                    else if (operator === '×') isCorrect = (num1 * num2 === targetResult);
-                    else if (operator === '/') isCorrect = (num2 !== 0 && num1 / num2 === targetResult);
-                } else {
-                    notification.textContent = 'Hãy điền đầy đủ hai số vào ô trống nhé! 😊';
-                }
-            } else if (exerciseType === 1) { // Bài tập sắp xếp
-                if (filledDropzones.length === 5) {
-                    const currentNumbers = Array.from(filledDropzones).map(zone =>
-                        parseInt(zone.querySelector('.draggable-number').dataset.value)
-                    );
-                    isCorrect = currentNumbers.every((num, index) =>
-                        num === parseInt(sortedNumbers[index])
-                    );
-                } else {
-                    notification.textContent = 'Hãy điền đầy đủ các số vào ô trống nhé! 😊';
-                }
-            } else if (exerciseType === 2) { // Nối cột
-                dropzones.forEach(zone => {
-                    const draggedId = Object.keys(pairs).find(key => pairs[key] === zone.dataset.id);
-                    if (!draggedId || draggedId !== zone.dataset.id) isCorrect = false;
-                });
-            }
-
-            handleAnswer(isCorrect, filledDropzones);
-        });
-
-
-        function handleAnswer(isCorrect, dropzones) {
-            const retryButton = document.getElementById('retryButton');
-            const notification = document.getElementById('notification');
-
-            if (isCorrect) {
-                isAnswerCorrect = true;
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                correctSound.play();
-                notification.textContent = 'Chúc mừng! Bạn đã trả lời đúng! 🎉';
-
-                dropzones.forEach(zone => zone.classList.add('success-animation'));
-
-                const nextButton = document.getElementById('nextButton');
-                const finishButton = document.getElementById('finishButton');
-
-                // Chỉ hiển thị nút "Hoàn thành bài học" khi đây là bài tập cuối cùng
-                if (<?php echo json_encode($isLastExercise); ?>) {
-                    nextButton.style.display = 'none'; // Ẩn nút Bài tiếp theo
-                    finishButton.style.display = 'block'; // Hiển thị nút Hoàn thành bài học
-                } else {
-                    nextButton.style.display = 'block'; // Hiển thị nút Bài tiếp theo
-                    finishButton.style.display = 'none'; // Ẩn nút Hoàn thành bài học
-                }
-            } else {
-                wrongSound.play();
-                notification.textContent = 'Hãy thử lại nhé! 😊';
-
-                dropzones.forEach(zone => {
-                    zone.classList.add('error-animation');
-                    setTimeout(() => {
-                        zone.classList.remove('error-animation');
-                        zone.innerHTML = '';
-                        zone.classList.remove('filled');
-                    }, 500);
-                });
-
-                retryButton.style.display = 'block';
-            }
+        if (filledDropzones.length < dropzones.length) {
+            notification.textContent = 'Hãy điền đầy đủ dữ liệu vào các ô nhé! 😊';
+            return;
         }
 
-        // Xử lý sự kiện nút "Thử lại"       
-        document.getElementById('retryButton').addEventListener('click', function () {
-            window.location.reload();
-        });
+        if (exerciseType === 0) {
+            const num1 = parseFloat(filledDropzones[0].textContent);
+            const num2 = parseFloat(filledDropzones[1].textContent);
+
+            if (operator === '+') isCorrect = (num1 + num2 === targetResult);
+            else if (operator === '-') isCorrect = (num1 - num2 === targetResult);
+            else if (operator === '×') isCorrect = (num1 * num2 === targetResult);
+            else if (operator === '/') isCorrect = (num2 !== 0 && num1 / num2 === targetResult);
+        } else if (exerciseType === 1) {
+            const currentNumbers = Array.from(filledDropzones).map(zone =>
+                parseInt(zone.querySelector('.draggable-number').dataset.value)
+            );
+            isCorrect = currentNumbers.every((num, index) => num === parseInt(sortedNumbers[index]));
+        } else if (exerciseType === 2) {
+            dropzones.forEach(zone => {
+                const draggedId = Object.keys(pairs).find(key => pairs[key] === zone.dataset.id);
+                if (!draggedId || draggedId !== zone.dataset.id) isCorrect = false;
+            });
+        }
+
+        handleAnswer(isCorrect, filledDropzones, retryButton, notification, nextButton, finishedButton);
     });
+
+    function handleAnswer(isCorrect, dropzones, retryButton, notification, nextButton, finishedButton) {
+        if (isCorrect) {
+            isAnswerCorrect = true;
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            correctSound.play();
+            notification.textContent = 'Chúc mừng! Bạn đã trả lời đúng! 🎉';
+
+            dropzones.forEach(zone => zone.classList.add('success-animation'));
+
+            if (<?php echo json_encode($isLastExercise); ?>) {
+                finishedButton.style.display = 'block';
+            } else {
+                nextButton.style.display = 'block';
+            }
+        } else {
+            wrongSound.play();
+            notification.textContent = 'Hãy thử lại nhé! 😊';
+
+            dropzones.forEach(zone => {
+                zone.classList.add('error-animation');
+                setTimeout(() => {
+                    zone.classList.remove('error-animation');
+                    zone.innerHTML = '';
+                    zone.classList.remove('filled');
+                }, 500);
+            });
+
+            retryButton.style.display = 'block';
+        }
+    }
+
+    document.getElementById('retryButton').addEventListener('click', function() {
+        // Lấy thông tin bài tập
+        const exerciseType = <?php echo json_encode($exerciseType); ?>;
+        const currentOrder = <?php echo json_encode($currentOrder); ?>;
+
+        // Gửi yêu cầu POST để lưu thông tin vào session
+        const formData = new FormData();
+        formData.append('retry', true);
+        formData.append('exerciseType', exerciseType);
+        formData.append('currentOrder', currentOrder);
+
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                // Tải lại trang hiện tại
+                location.reload();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+
+
+    if ($isLastExercise) {
+        // Xóa giá trị session
+        unset($_SESSION['exerciseType']);
+        unset($_SESSION['currentOrder']);
+    }
+});
+
     </script>
 </body>
 

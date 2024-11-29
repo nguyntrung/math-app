@@ -19,11 +19,11 @@ if (!$maBaiHoc) {
 try {
     // Lấy tất cả câu hỏi từ hai bảng (Câu hỏi trắc nghiệm và tự luận)
     $stmt = $conn->prepare("
-        (SELECT 'MC' as type, MaCauHoi, NoiDung, DapAnA, DapAnB, DapAnC, DapAnD, DapAnDung, NULL as LoiGiai
+        (SELECT 'MC' as type, MaCauHoi, NoiDung, DapAnA, DapAnB, DapAnC, DapAnD, DapAnDung, GiaiThich, NULL as LoiGiai
         FROM cauhoitracnghiem 
         WHERE MaBaiHoc = :maBaiHoc)
         UNION ALL
-        (SELECT 'SA' as type, MaCauHoi, NoiDung, NULL, NULL, NULL, NULL, NULL, LoiGiai
+        (SELECT 'SA' as type, MaCauHoi, NoiDung, NULL, NULL, NULL, NULL, NULL, GiaiThich, LoiGiai
         FROM cauhoituluan 
         WHERE MaBaiHoc = :maBaiHoc)
         ORDER BY RAND()
@@ -227,6 +227,33 @@ try {
             max-width: 200px;
             margin: 10px auto;
         }
+        .feedback-container {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .feedback-correct {
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        .feedback-incorrect {
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+        .explanation {
+            margin-top: 10px;
+            font-style: italic;
+        }
+        #nextQuestionBtn {
+            display: none;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
@@ -235,8 +262,15 @@ try {
     <div class="container mt-4">
         <div class="quiz-container">
             <?php if ($completed): ?>
-                <div class="alert alert-success" role="alert">
-                    Bạn đã hoàn thành tất cả câu hỏi!
+                <div class="header-container">
+                    <p class="header-item m-0"><?php echo htmlspecialchars($tenBaiHoc); ?></p>
+                    <div class="timer header-item">
+                        <i class="fa-regular fa-clock"></i>
+                        <span id="timer">00:00:00</span>
+                    </div>
+                    <div class="progress-bar header-item">
+                        <div class="progress-fill" id="progressFill">Bạn đã hoàn thành</div>
+                    </div>
                 </div>
             <?php else: ?>
                 <div class="header-container">
@@ -253,7 +287,9 @@ try {
                     <div id="questionContainer">
                         <!-- Question content will be loaded here -->
                     </div>
+                    <div id="feedbackContainer" class="feedback-container" style="display:none;"></div>
                     <button id="submitAnswer" class="btn btn-success w-100">Trả lời</button>
+                    <button id="nextQuestionBtn" class="btn btn-primary w-100">Câu hỏi tiếp theo</button>
                 </div>
                 <div id="questionStatus" class="text-center mt-3">
                     <!-- Show progress: X out of Y questions -->
@@ -295,6 +331,15 @@ try {
         function displayQuestion() {
             const question = remainingQuestions[currentQuestionIndex];
             const container = document.getElementById('questionContainer');
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            const submitBtn = document.getElementById('submitAnswer');
+            const nextBtn = document.getElementById('nextQuestionBtn');
+            
+            // Reset UI elements
+            feedbackContainer.style.display = 'none';
+            feedbackContainer.innerHTML = '';
+            submitBtn.style.display = 'block';
+            nextBtn.style.display = 'none';
             
             let html = `<p>${question.NoiDung}</p>`;
             
@@ -327,7 +372,11 @@ try {
         // Lưu câu trả lời và tiến độ
         async function submitAnswer() {
             const question = remainingQuestions[currentQuestionIndex];
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            const submitBtn = document.getElementById('submitAnswer');
+            const nextBtn = document.getElementById('nextQuestionBtn');
             let answer = '';
+            let isCorrect = false;
             
             if (question.type === 'MC') {
                 const selected = document.querySelector('.option-button.selected');
@@ -336,12 +385,16 @@ try {
                     return;
                 }
                 answer = selected.dataset.answer;
+                isCorrect = answer === question.DapAnDung;
             } else {
                 answer = document.getElementById('textAnswer').value.trim();
                 if (!answer) {
                     alert('Vui lòng nhập câu trả lời');
                     return;
                 }
+                // For short answer questions, you might want to implement more sophisticated checking
+                // This is a simple placeholder - you'd typically have more complex logic
+                isCorrect = answer.toLowerCase() === question.LoiGiai.toLowerCase();
             }
 
             const now = new Date();
@@ -369,24 +422,39 @@ try {
                     answeredCount++;
                     updateProgress();
 
-                    currentQuestionIndex++;
+                    // Display feedback
+                    feedbackContainer.innerHTML = `
+                        <div class="feedback-${isCorrect ? 'correct' : 'incorrect'}">
+                            ${isCorrect ? 'Chúc mừng! Câu trả lời đúng.' : 'Rất tiếc. Câu trả lời chưa đúng.'}
+                            ${question.GiaiThich ? `<div class="explanation">Giải thích: ${question.GiaiThich}</div>` : ''}
+                        </div>
+                    `;
+                    feedbackContainer.style.display = 'block';
                     
-                    if (currentQuestionIndex < remainingQuestions.length) {
-                        startTime = new Date();
-                        displayQuestion();
-                    } else {
-                        if (answeredCount < totalQuestions) {
-                            alert('Bạn đã hoàn thành ' + answeredCount + '/' + totalQuestions + ' câu hỏi');
-                            window.location.reload();
-                        } else {
-                            alert('Bạn đã hoàn thành tất cả câu hỏi!');
-                            window.location.href = 'index.php';
-                        }
-                    }
+                    // Hide submit button, show next button
+                    submitBtn.style.display = 'none';
+                    nextBtn.style.display = 'block';
                 }
             } catch (error) {
                 console.error('Error:', error);
                 alert('Có lỗi xảy ra khi lưu câu trả lời');
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < remainingQuestions.length) {
+                startTime = new Date();
+                displayQuestion();
+            } else {
+                if (answeredCount < totalQuestions) {
+                    alert('Bạn đã hoàn thành ' + answeredCount + '/' + totalQuestions + ' câu hỏi');
+                    window.location.reload();
+                } else {
+                    alert('Bạn đã hoàn thành tất cả câu hỏi!');
+                    window.location.href = 'index.php';
+                }
             }
         }
 
@@ -396,6 +464,7 @@ try {
             updateProgress();
             setInterval(updateTimer, 1000);
             document.getElementById('submitAnswer').addEventListener('click', submitAnswer);
+            document.getElementById('nextQuestionBtn').addEventListener('click', nextQuestion);
         }
     </script>
 </body>
