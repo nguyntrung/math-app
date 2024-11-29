@@ -113,6 +113,18 @@
          </a>
       </li>
       <li class="menu-item">
+         <a href="question_management.php" class="menu-link">
+            <i class="menu-icon tf-icons ri-table-alt-line"></i>
+            <div data-i18n="Tables">Câu Hỏi Ôn Tập</div>
+         </a>
+      </li>
+      <li class="menu-item">
+         <a href="exercises_manage.php" class="menu-link">
+            <i class="menu-icon tf-icons ri-table-alt-line"></i>
+            <div data-i18n="Tables">Bài Tập Nối Cột</div>
+         </a>
+      </li>
+      <li class="menu-item">
          <a href="admin_contact.php" class="menu-link">
             <i class="menu-icon tf-icons ri-table-alt-line"></i>
             <div data-i18n="Tables">Quản Lý Liên Hệ</div>
