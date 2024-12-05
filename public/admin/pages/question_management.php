@@ -11,7 +11,7 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 include '../../../database/db.php';
 
 // Lấy danh sách chương học từ cơ sở dữ liệu
-$stmt = $conn->prepare("SELECT MaBaiTap, So1, So2, So3, So4, So5, KetQua, PhepToan, ThuTu FROM cauhoiontap ORDER BY ThuTu ASC");
+$stmt = $conn->prepare("SELECT MaBaiTap, So1, So2, So3, So4, So5, KetQua, PhepToan, ThuTu FROM baitapvui ORDER BY ThuTu ASC");
 $stmt->execute();
 $cauhoiOnTapList = $stmt->fetchAll();
 
@@ -25,7 +25,7 @@ $cauhoiOnTapList = $stmt->fetchAll();
     <meta charset="utf-8" />
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-    <title>Quản lý câu hỏi ôn tập</title>
+    <title>Quản lý bài tập vui</title>
     <meta name="description" content="" />
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="../assets/img/favicon/favicon.ico" />

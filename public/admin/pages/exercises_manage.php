@@ -11,7 +11,7 @@ if (!isset($_SESSION['MaNguoiDung'])) {
 include '../../../database/db.php';
 
 // Lấy danh sách nối cột từ cơ sở dữ liệu
-$stmt = $conn->prepare("SELECT MaNoiCot, CauHoi, CauTraLoi FROM noicot");
+$stmt = $conn->prepare("SELECT MaNoiCot, CauHoi, CauTraLoi FROM cauhoivui");
 $stmt->execute();
 $noiCotList = $stmt->fetchAll();
 ?>
@@ -24,7 +24,7 @@ $noiCotList = $stmt->fetchAll();
     <meta charset="utf-8" />
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-    <title>Quản lý bài tập nối cột</title>
+    <title>Quản lý bài tập câu hỏi vui</title>
     <meta name="description" content="" />
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="../assets/img/favicon/favicon.ico" />
