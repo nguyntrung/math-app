@@ -233,12 +233,23 @@ try {
             font-weight: 500;
         }
 
-        .answer-option {
+        .answer-option-container {
+            display: flex;
+            justify-content: space-between;
             margin: 10px 0;
+        }
+
+        .answer-option {
+            flex: 1;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s;
             border: 2px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            margin: 5px;
         }
 
         .answer-option:hover {
@@ -255,21 +266,21 @@ try {
             display: flex;
             align-items: center;
             margin: 0;
-            padding: 10px;
+            padding: 5px;
             cursor: pointer;
+            font-size: small;
             width: 100%;
-            font-size: 1rem;
         }
 
         .submit-btn {
-            background: linear-gradient(45deg, #4A90E2, #67B26F);
+            background: #66cb87;
+            width: 25%;
+            margin: 0 auto;
+            display: block;
             border: none;
             padding: 15px 30px;
-            font-size: 1.2rem;
             border-radius: 50px;
             color: white;
-            width: 100%;
-            margin-top: 30px;
             transition: all 0.3s;
             font-weight: bold;
         }
@@ -318,12 +329,12 @@ try {
         }
         .timer-container {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 130px;
+            right: 50px;
             background-color: #4A90E2;
             color: white;
-            padding: 10px 20px;
-            border-radius: 50px;
+            padding: 20px;
+            border-radius: 5px;
             font-weight: bold;
             z-index: 1000;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -346,10 +357,12 @@ try {
 
     <div class="container pt-5">
         <?php if ($showQuiz): ?>
-            <div class="timer-container" id="timer">30:00</div>
+            <div class="timer-container">
+                <p class="m-0">Thời gian làm bài còn lại: <span id="timer">30:00</span></p>
+            </div>
         <?php endif; ?>
 
-        <div class="quiz-container">
+        <div class="quiz-container mb-5">
             <?php if ($showQuiz): ?>
                 <h4 class="quiz-title">KIỂM TRA</h4>
                 <h4 class="quiz-title"><?= htmlspecialchars($chapterName); ?></h4>
@@ -360,40 +373,42 @@ try {
                 <form method="POST" action="" id="quizForm">
                     <input type="hidden" name="thoiGianLamBai" id="thoiGianLamBai" value="0">
                     <?php foreach ($cauHoiList as $index => $cauHoi): ?>
-                    <div class="question-card">
-                        <div class="d-flex align-items-center">
-                            <span class="question-number"><?= ($index + 1) ?></span>
-                            <p class="question-content"><?= htmlspecialchars($cauHoi['NoiDung']); ?></p>
-                        </div>
+                        <div class="question-card">
+                            <div class="d-flex align-items-center">
+                                <span class="question-number"><?= ($index + 1) ?></span>
+                                <p class="question-content"><?= htmlspecialchars($cauHoi['NoiDung']); ?></p>
+                            </div>
 
-                        <div class="answer-option">
-                            <label>
-                                <input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="A" required>
-                                <span>A. <?= htmlspecialchars($cauHoi['DapAnA']); ?></span>
-                            </label>
+                            <div class="answer-option-container">
+                                <div class="answer-option">
+                                    <label>
+                                        <input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="A" required>
+                                        <span>A. <?= htmlspecialchars($cauHoi['DapAnA']); ?></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="answer-option">
+                                    <label>
+                                        <input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="B">
+                                        <span>B. <?= htmlspecialchars($cauHoi['DapAnB']); ?></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="answer-option">
+                                    <label>
+                                        <input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="C">
+                                        <span>C. <?= htmlspecialchars($cauHoi['DapAnC']); ?></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="answer-option">
+                                    <label>
+                                        <input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="D">
+                                        <span>D. <?= htmlspecialchars($cauHoi['DapAnD']); ?></span>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
-                        
-                        <div class="answer-option">
-                            <label>
-                                <input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="B">
-                                <span>B. <?= htmlspecialchars($cauHoi['DapAnB']); ?></span>
-                            </label>
-                        </div>
-                        
-                        <div class="answer-option">
-                            <label>
-                                <input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="C">
-                                <span>C. <?= htmlspecialchars($cauHoi['DapAnC']); ?></span>
-                            </label>
-                        </div>
-                        
-                        <div class="answer-option">
-                            <label>
-                                <input type="radio" name="cauHoi[<?= $cauHoi['MaCauHoi']; ?>]" value="D">
-                                <span>D. <?= htmlspecialchars($cauHoi['DapAnD']); ?></span>
-                            </label>
-                        </div>
-                    </div>
                     <?php endforeach; ?>
 
                     <button type="submit" class="submit-btn">

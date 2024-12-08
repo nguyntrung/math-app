@@ -7,7 +7,7 @@
                 <i class="flaticon-043-teddy-bear"></i>
                 <span class="text-dark">TOAN5.VN</span>
             </a>
-            <p>Chào mừng bạn đến với ToanLop5.vn, nơi cung cấp những bài học toán thú vị cho học sinh tiểu học. Chúng tôi luôn nỗ lực mang đến cho các bạn những kiến thức bổ ích và dễ hiểu nhất!</p>
+            <p>Chào mừng bạn đến với toan5.vn, nơi cung cấp những bài học toán thú vị cho học sinh tiểu học. Chúng tôi luôn nỗ lực mang đến cho các bạn những kiến thức bổ ích và dễ hiểu nhất!</p>
             <div class="d-flex justify-content-start mt-4">
                 <a class="btn btn-outline-info rounded-circle text-center mr-2 px-0" style="width: 38px; height: 38px;" href="#"><i class="fab fa-twitter"></i></a>
                 <a class="btn btn-outline-info rounded-circle text-center mr-2 px-0" style="width: 38px; height: 38px;" href="#"><i class="fab fa-facebook-f"></i></a>
@@ -23,21 +23,21 @@
                 <h4 class="fa fa-map-marker-alt text-info"></h4>
                 <div class="pl-3">
                     <h5 class="text-dark">Địa chỉ</h5>
-                    <p>123 Street, New York, USA</p>
+                    <p>140 Lê Trọng Tấn</p>
                 </div>
             </div>
             <div class="d-flex">
                 <h4 class="fa fa-envelope text-info"></h4>
                 <div class="pl-3">
                     <h5 class="text-dark">Email</h5>
-                    <p>info@example.com</p>
+                    <p>info@toan5.vn</p>
                 </div>
             </div>
             <div class="d-flex">
                 <h4 class="fa fa-phone-alt text-info"></h4>
                 <div class="pl-3">
                     <h5 class="text-dark">Điện thoại</h5>
-                    <p>+012 345 67890</p>
+                    <p>0985559999</p>
                 </div>
             </div>
         </div>

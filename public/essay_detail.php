@@ -41,71 +41,135 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submitEssay'])) {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Bài Tập Tự Luận</title>
 
     <?php include '../includes/styles.php'; ?>
+    <style>
+        .essay-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 1130px;
+        }
+
+        .question-card {
+            display: flex;
+            align-items: center;
+            background-color: #e6f2ff;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+        }
+
+        .question-text {
+            flex-grow: 1;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .form-control {
+            width: 200px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 2px solid #4CAF50;
+            font-size: 14px;
+        }        
+        
+        .form-control:focus {
+            border-color: #2196F3;
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
+        }
+
+        .result-card {
+            border-radius: 10px;
+            margin-bottom: 15px;
+            padding: 15px;
+        }
+
+        .result-card-correct {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .result-card-incorrect {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .btn-submit {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <?php include '../includes/navbar.php'; ?>
     
-    <!-- Main Start -->
-    <div class="container pt-5">
-        <div class="container pb-5">
-            <h1 class="text-center mb-4">Bài Tập Tự Luận</h1>
-            
-            <?php if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submitEssay'])): ?>
-                <!-- Hiển thị kết quả sau khi nộp bài -->
-                <h3 class="text-center">Kết Quả</h3>
-                <div class="mt-3">
-                    <?php foreach ($ketQua as $index => $result): ?>
-                        <div class="card mb-2">
-                            <div class="card-header" style="background-color: <?= $result['isCorrect'] ? '#d4edda' : '#f8d7da'; ?>">
-                                Câu <?= $index + 1; ?>:
-                            </div>
-                            <div class="card-body">
-                                <p><strong>Câu trả lời của bạn:</strong> <?= htmlspecialchars($result['dapAnChon']); ?></p>
-                                <p><strong>Đáp án đúng:</strong> <?= htmlspecialchars($result['cauHoi']['LoiGiai']); ?></p>
-                                <p><strong>Kết quả:</strong> <?= $result['isCorrect'] ? 'Đúng' : 'Sai'; ?></p>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-                <div class="text-center">
-                    <a href="essay_detail.php?maBaiHoc=<?= $maBaiHoc; ?>" class="btn btn-primary">Làm lại bài tập</a>
-                </div>
-            <?php else: ?>
-                <!-- Hiển thị câu hỏi và nhập câu trả lời -->
-                <form action="essay_detail.php?maBaiHoc=<?= $maBaiHoc; ?>" method="POST">
-                    <?php foreach ($cauHoiTuLuan as $index => $cauHoi): ?>
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <p class="mb-0">Câu <?= $index + 1; ?>: <?= htmlspecialchars($cauHoi['NoiDung']); ?></p>
-                            </div>
-                            <div class="card-body">
-                                <input name="answer_<?= $cauHoi['MaCauHoi']; ?>" rows="4" class="form-control" placeholder="Nhập kết quả" required>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                    
-                    <div class="text-center">
-                        <button type="submit" name="submitEssay" class="btn btn-success">Nộp bài</button>
+    <div class="container essay-container">
+        <h1 class="text-center mb-4" style="color: #2196F3;">Bài Tập Vui Vẻ</h1>
+        
+        <?php if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submitEssay'])): ?>
+            <!-- Hiển thị kết quả sau khi nộp bài -->
+            <h3 class="text-center">Kết Quả Của Bạn</h3>
+            <div class="mt-3">
+                <?php foreach ($ketQua as $index => $result): ?>
+                    <div class="result-card <?= $result['isCorrect'] ? 'result-card-correct' : 'result-card-incorrect'; ?>">
+                        <p><strong>Câu <?= $index + 1; ?>:</strong> <?= htmlspecialchars($result['cauHoi']['NoiDung']); ?></p>
+                        <p><strong>Câu trả lời của bạn:</strong> <?= htmlspecialchars($result['dapAnChon']); ?></p>
+                        <p><strong>Đáp án đúng:</strong> <?= htmlspecialchars($result['cauHoi']['LoiGiai']); ?></p>
+                        <p><strong>Kết quả:</strong> <?= $result['isCorrect'] ? '✅ Đúng rồi!' : '❌ Chưa đúng'; ?></p>
                     </div>
-                </form>
-            <?php endif; ?>
-        </div>
+                <?php endforeach; ?>
+            </div>
+            <div class="text-center">
+                <a href="essay_detail.php?maBaiHoc=<?= $maBaiHoc; ?>" class="btn-submit">Làm lại</a>
+            </div>
+        <?php else: ?>
+            <!-- Hiển thị câu hỏi và nhập câu trả lời -->
+            <form action="essay_detail.php?maBaiHoc=<?= $maBaiHoc; ?>" method="POST">
+                <?php foreach ($cauHoiTuLuan as $index => $cauHoi): ?>
+                    <div class="question-card">
+                        <div class="question-text">
+                            Câu <?= $index + 1; ?>: <?= htmlspecialchars($cauHoi['NoiDung']); ?>
+                        </div>
+                        <input 
+                            type="text" 
+                            name="answer_<?= $cauHoi['MaCauHoi']; ?>" 
+                            class="form-control" 
+                            placeholder="Trả lời tại đây" 
+                            required
+                        >
+                    </div>
+                <?php endforeach; ?>
+                
+                <div class="text-center">
+                    <button type="submit" name="submitEssay" class="btn-submit">Nộp bài</button>
+                </div>
+            </form>
+        <?php endif; ?>
     </div>
-    <!-- Main End -->
 
     <?php include '../includes/footer.php'; ?>
-
-    <!-- Back to Top -->
-    <a href="#" class="btn btn-primary p-3 back-to-top"><i class="fa-solid fa-up-long"></i></a>
-
     <?php include '../includes/scripts.php'; ?>
 </body>
 </html>

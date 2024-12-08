@@ -51,13 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $endTime = strtotime($ngayThi);
         $thoiGianThi = $endTime - $startTime; // Tính thời gian thi (giây)
 
-        $sql = "INSERT INTO ketqua (MaNguoiDung, Diem, ThoiGianThi, NgayThi) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO xephangthidau (MaNguoiDung, Diem, ThoiGianThi, NgayThi) VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
         $stmt->execute([$maNguoiDung, $diem, $thoiGianThi, $ngayThi]);
     } else {
-        // Nếu không có dữ liệu câu hỏi, có thể là lỗi trong việc gửi biểu mẫu
         $showQuiz = false;
-        $diem = 0; // Hoặc có thể thông báo lỗi
+        $diem = 0;
     }
 }
 
@@ -80,7 +79,7 @@ if ($showQuiz) {
     <?php include '../includes/styles.php'; ?>
     <style>
         .quiz-header {
-            background: linear-gradient(45deg, #FF512F, #DD2476);
+            background: linear-gradient(45deg, #7de381, #4CAF50);
             border-radius: 15px;
             padding: 30px;
             margin-bottom: 30px;
@@ -101,6 +100,22 @@ if ($showQuiz) {
 
         .question-card:hover {
             transform: translateY(-3px);
+        }
+
+        .card-header {
+            background: #4CAF50;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            max-width: 200px;
+            margin: 0 auto;
+            border-radius: 25px;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #7de381;
         }
 
         .answer-option {
@@ -170,7 +185,7 @@ if ($showQuiz) {
                     <!-- Questions Section -->
                     <?php foreach ($cauHoiList as $index => $cauHoi): ?>
                     <div class="card question-card mb-4 shadow-sm">
-                        <div class="card-header bg-primary text-white d-flex align-items-center">
+                        <div class="card-header text-white d-flex align-items-center">
                             <span class="badge badge-light mr-2 p-2">Câu <?= ($index + 1) ?></span>
                             <h5 class="mb-0 flex-grow-1 text-white"><?= htmlspecialchars($cauHoi['NoiDung']); ?></h5>
                         </div>
@@ -207,7 +222,7 @@ if ($showQuiz) {
                 <!-- Sidebar Progress -->
                 <div class="col-lg-3">
                     <div class="card shadow-sm position-sticky" style="top: 20px;">
-                        <div class="card-header bg-primary text-white">
+                        <div class="card-header text-white">
                             <h5 class="mb-0 text-white"><i class="fas fa-list-ol mr-2 text-white"></i>Tiến Độ</h5>
                         </div>
                         <div class="card-body">
@@ -259,7 +274,7 @@ if ($showQuiz) {
                     </div>
                 </div>
 
-                <a href="trangchu.php" class="btn btn-primary">Trở về trang chủ</a>
+                <a href="index.php" class="btn btn-primary">Trở về trang chủ</a>
             </div>
         </div>
         <?php endif; ?>
@@ -269,6 +284,44 @@ if ($showQuiz) {
         // Timer countdown functionality (optional)
         const countdownElement = document.getElementById('countdown');
         const totalTime = 45 * 60; // Total time in seconds (45 minutes)
+        // Lấy các phần tử cần thiết
+        const answeredCountElement = document.getElementById('answeredCount');
+        const remainingCountElement = document.getElementById('remainingCount');
+        const progressBarElement = document.getElementById('progressBar');
+        const totalQuestions = 40; // Tổng số câu hỏi
+
+        let answeredCount = 0; // Số câu trả lời đã chọn
+        let questionAnswered = new Array(totalQuestions).fill(false); // Mảng theo dõi trạng thái câu trả lời
+
+        // Hàm cập nhật tiến độ
+        function updateProgress() {
+            const remainingCount = totalQuestions - answeredCount;
+            answeredCountElement.innerText = answeredCount;
+            remainingCountElement.innerText = remainingCount;
+            const progress = (answeredCount / totalQuestions) * 100;
+            progressBarElement.style.width = `${progress}%`;
+            progressBarElement.innerText = `${Math.round(progress)}%`;
+        }
+
+        // Xử lý khi người dùng chọn câu trả lời
+        document.querySelectorAll('input[type="radio"]').forEach(input => {
+            input.addEventListener('change', function () {
+                const questionId = this.name.split('[')[1].split(']')[0]; // Lấy ID câu hỏi từ name attribute
+                const questionIndex = parseInt(questionId) - 1; // Chuyển ID sang chỉ số mảng
+
+                // Kiểm tra trạng thái của câu hỏi này
+                if (!questionAnswered[questionIndex]) {
+                    answeredCount++; // Tăng số câu trả lời đã chọn
+                    questionAnswered[questionIndex] = true; // Đánh dấu câu hỏi này là đã trả lời
+                }
+
+                // Cập nhật lại tiến độ
+                updateProgress();
+            });
+        });
+
+        // Ban đầu cập nhật tiến độ khi trang được tải
+        updateProgress();
 
         let timeRemaining = totalTime;
 
@@ -285,5 +338,7 @@ if ($showQuiz) {
 
         const countdownInterval = setInterval(updateCountdown, 1000);
     </script>
+
+    <?php include '../includes/scripts.php'; ?>
 </body>
 </html>
