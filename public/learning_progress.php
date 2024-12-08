@@ -101,7 +101,7 @@ foreach ($chuongBaiHocList as $row) {
          border-radius: 8px;
          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
          margin: 20px auto;
-         max-width: 1200px;
+         max-width: 1130px;
       }
       .progress-table {
          width: 100%;
@@ -220,7 +220,7 @@ foreach ($chuongBaiHocList as $row) {
                      <div class="lesson-item flex-2 text-center">
                         <div class="question-status">
                            <span class="status-dot <?= $baiHoc['answeredQuestions'] > 0 ? 'completed' : '' ?>"></span>
-                           <?= $baiHoc['answeredQuestions'] ?> Câu
+                           <?= $baiHoc['answeredQuestions'] ?>/20 Câu
                         </div>
                      </div>
                      <div class="lesson-item flex-1 text-center">

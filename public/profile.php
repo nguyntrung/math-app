@@ -123,7 +123,7 @@ if (!$user) {
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h5 class="card-title mb-0" style="color: #65B446">Thông tin cá nhân</h5>
-                            <a href="registermember.php" class="btn btn-outline-primary btn-sm">
+                            <a href="edit_profile.php" class="btn btn-outline-primary btn-sm">
                                 <i class="fas fa-edit"></i> Cập nhật
                             </a>
                         </div>

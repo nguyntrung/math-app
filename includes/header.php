@@ -4,11 +4,11 @@
             <div class="col-lg-6 text-center text-lg-left content-column">
                 <div class="header-content" data-aos="fade-right">
                     <span class="badge">Website học toán cho học sinh lớp 5</span>
-                    <h1 class="header-title">New Approach to Kids Education</h1>
+                    <h1 class="header-title">Cách tiếp cận mới cho giáo dục trẻ em</h1>
                     <p class="header-description">
-                        Sea ipsum kasd eirmod kasd magna, est sea et diam ipsum est amet sed sit.
-                        Ipsum dolor no justo dolor et, lorem ut dolor erat dolore sed ipsum at ipsum nonumy amet. Clita
-                        lorem dolore sed stet et est justo dolore.
+                        Chào mừng bạn đến với toan5.vn, nơi cung cấp những bài học toán thú vị
+                        cho học sinh tiểu học. Chúng tôi luôn nỗ lực mang đến cho các bạn những
+                        kiến thức bổ ích và dễ hiểu nhất!
                     </p>
                     <a href="#" class="cta-button">
                         <span>Tìm hiểu thêm</span>

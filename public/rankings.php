@@ -13,10 +13,10 @@
    }
       
    // Truy vấn bảng xếp hạng (dựa trên điểm số và thời gian thi)
-   $stmtRanking = $conn->prepare("SELECT nguoidung.HoTen, ketqua.Diem, ketqua.NgayThi 
-                                           FROM ketqua 
-                                           JOIN nguoidung ON ketqua.MaNguoiDung = nguoidung.MaNguoiDung
-                                           ORDER BY ketqua.Diem DESC, ketqua.NgayThi ASC");
+   $stmtRanking = $conn->prepare("SELECT nguoidung.HoTen, xephangthidau.Diem, xephangthidau.NgayThi 
+                                           FROM xephangthidau 
+                                           JOIN nguoidung ON xephangthidau.MaNguoiDung = nguoidung.MaNguoiDung
+                                           ORDER BY xephangthidau.Diem DESC, xephangthidau.NgayThi ASC");
    $stmtRanking->execute();
    $rankingList = $stmtRanking->fetchAll(PDO::FETCH_ASSOC);
    ?>

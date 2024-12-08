@@ -95,21 +95,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submitQuiz'])) {
             font-weight: 500;
         }
 
+        /* Thay đổi style để hiển thị 4 đáp án trên 1 dòng */
+        .answer-options-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
         .answer-option {
+            flex: 1;
             position: relative;
-            padding: 15px;
-            margin: 10px;
+            padding: 12px;
+            margin: 5px;
             border: 2px solid #e9ecef;
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
-            display: block;
+            text-align: center;
+            min-width: 100px;
         }
 
         .answer-option:hover {
             border-color: var(--primary-light);
             background-color: #f8f9fa;
-            transform: translateX(5px);
+            transform: scale(1.02);
         }
 
         /* Ẩn input radio mặc định */
@@ -120,8 +129,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submitQuiz'])) {
         /* Style cho label khi được chọn */
         .answer-option.selected {
             border-color: var(--primary-color);
-            background-color: rgba(67, 97, 238, 0.05);
-            padding-left: 20px;
+            background-color: rgba(67, 97, 238, 0.1);
+            font-weight: bold;
+        }
+
+        /* Responsive cho màn hình nhỏ */
+        @media (max-width: 576px) {
+            .answer-options-row {
+                flex-direction: column;
+            }
+
+            .answer-option {
+                margin: 5px 0;
+                width: 100%;
+            }
         }
 
         .answer-option.selected::before {
@@ -207,6 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submitQuiz'])) {
             </div>
             
             <?php if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submitQuiz'])): ?>
+                <!-- Phần kết quả giữ nguyên như ở phiên bản trước -->
                 <div class="result-container">
                     <div class="result-emoji text-center">
                         <?php echo $diem >= 5 ? '🎉' : '💪'; ?>
@@ -267,17 +289,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submitQuiz'])) {
                                 Câu <?= $index + 1; ?>: <?= htmlspecialchars($cauHoi['NoiDung']); ?>
                             </div>
                             <div class="card-body">
-                                <?php
-                                $dapAn = ['A', 'B', 'C', 'D'];
-                                foreach ($dapAn as $option):
-                                ?>
-                                    <label class="answer-option" onclick="selectAnswer(this)">
-                                        <input type="radio" 
-                                               name="answer_<?= $cauHoi['MaCauHoi']; ?>" 
-                                               value="<?= $option ?>">
-                                        <?= htmlspecialchars($cauHoi['DapAn' . $option]); ?>
-                                    </label>
-                                <?php endforeach; ?>
+                                <div class="answer-options-row">
+                                    <?php
+                                    $dapAn = ['A', 'B', 'C', 'D'];
+                                    foreach ($dapAn as $option):
+                                    ?>
+                                        <label class="answer-option" onclick="selectAnswer(this)">
+                                            <input type="radio" 
+                                                   name="answer_<?= $cauHoi['MaCauHoi']; ?>" 
+                                                   value="<?= $option ?>">
+                                            <?= htmlspecialchars($cauHoi['DapAn' . $option]); ?>
+                                        </label>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
                         </div>
                     <?php endforeach; ?>

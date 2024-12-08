@@ -39,12 +39,13 @@ foreach ($chuongHoc as $chuong) {
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            /* background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%); */
+            background-color: #f0f0e6;
             color: #333;
         }
 
         .main-title {
-            color: #00838f;
+            color: #2c6d84;
             text-align: center;
             font-size: 2.5rem;
             margin: 2rem 0;
@@ -58,7 +59,7 @@ foreach ($chuongHoc as $chuong) {
         }
 
         .chapter-card {
-            background: white;
+            background: #ffffff;
             border-radius: 20px;
             border: none;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
@@ -71,8 +72,9 @@ foreach ($chuongHoc as $chuong) {
         }
 
         .chapter-header {
-            background: linear-gradient(45deg, #26c6da 0%, #00acc1 100%);
-            color: white;
+            background: #e6d5b8; /* Softer, warmer tone to match background */
+            color: #444;
+            font-weight: bold;
             padding: 1.2rem;
             border-radius: 20px 20px 0 0;
             font-size: 1.4rem;
@@ -87,23 +89,24 @@ foreach ($chuongHoc as $chuong) {
 
         .lesson-item {
             border: none;
-            background: #f5fdff;
+            background: #f5f5f0; /* Very light, slightly warm neutral */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
             margin: 15px;
             border-radius: 15px;
-            padding: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
         }
 
         .lesson-item:hover {
-            background: #e1f5fe;
+            background: #f0f4f4;
             transform: scale(1.01);
         }
 
         .lesson-title {
-            color: #0277bd;
+            color: #2c6d84;
             font-size: 1.2rem;
             cursor: pointer;
+            padding: 15px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -111,7 +114,7 @@ foreach ($chuongHoc as $chuong) {
         }
 
         .lesson-title:hover {
-            color: #00838f;
+            color: #1e4d5f;
         }
 
         .lesson-title i {
@@ -135,15 +138,16 @@ foreach ($chuongHoc as $chuong) {
             display: inline-block;
             margin-top: 15px;
             padding: 10px 20px;
-            background: #4caf50;
-            color: white;
+            background: #3e7a6c; /* Muted green with earthy undertones */
+    color: white;
+
             border-radius: 25px;
             text-decoration: none;
             transition: all 0.3s ease;
         }
 
         .quiz-link:hover {
-            background: #43a047;
+            background: #2c5c51;
             transform: scale(1.05);
             color: white;
             text-decoration: none;
@@ -157,7 +161,7 @@ foreach ($chuongHoc as $chuong) {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: #00acc1;
+            background: #2c6d84;
             color: white;
             border-radius: 50%;
             width: 50px;
@@ -172,7 +176,7 @@ foreach ($chuongHoc as $chuong) {
         }
 
         .back-to-top:hover {
-            background: #00838f;
+            background: #1e4d5f;
             transform: translateY(-5px);
             color: white;
         }
