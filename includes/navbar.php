@@ -51,10 +51,10 @@ if (isset($_SESSION['MaNguoiDung'])) {
                     <div class="dropdown-menu rounded-lg border-0 shadow-lg">
                         <a href="../public/solutions.php" class="dropdown-item py-2 px-4 hover-scale">
                             <i class="fas fa-book mr-2"></i>Giải bài tập SGK</a>
-                        <a href="../public/quiz_check.php" class="dropdown-item py-2 px-4 hover-scale">
-                            <i class="fas fa-clock mr-2"></i>Kiểm tra</a>
                         <a href="../public/exercise.php" class="dropdown-item py-2 px-4 hover-scale">
-                            <i class="fas fa-redo mr-2"></i>Ôn tập</a>
+                            <i class="fas fa-redo mr-2"></i>Bài tập vui</a>
+                        <a href="../public/sudoku.php" class="dropdown-item py-2 px-4 hover-scale">
+                            <i class="fas fa-redo mr-2"></i>Trò chơi Sudoku</a>
                     </div>
                 </div>
                 <a href="contact.php" class="nav-item nav-link rounded-pill px-4 mx-1 hover-scale">
