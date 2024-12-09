@@ -25,13 +25,13 @@ if (!isset($_SESSION['exerciseType']) || !isset($_SESSION['currentOrder'])) {
 $currentOrder = isset($_SESSION['currentOrder']) ? $_SESSION['currentOrder'] : (isset($_GET['order']) ? (int)$_GET['order'] : 1);
 
 // Lấy bài tập theo thứ tự
-$stmt = $conn->prepare("SELECT * FROM cauhoiontap WHERE ThuTu = :thutu");
+$stmt = $conn->prepare("SELECT * FROM baitapvui WHERE ThuTu = :thutu");
 $stmt->bindParam(':thutu', $currentOrder);
 $stmt->execute();
 $baitap = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Lấy tổng số bài tập
-$stmt = $conn->prepare("SELECT COUNT(*) as total FROM cauhoiontap");
+$stmt = $conn->prepare("SELECT COUNT(*) as total FROM baitapvui");
 $stmt->execute();
 $totalExercises = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
@@ -66,7 +66,7 @@ sort($sortedNumbers);
 
 if ($exerciseType == 2) {
     // Lấy dữ liệu bài nối cột
-    $stmt = $conn->prepare("SELECT * FROM noicot ORDER BY RAND() LIMIT 5");
+    $stmt = $conn->prepare("SELECT * FROM cauhoivui ORDER BY RAND() LIMIT 5");
     $stmt->execute();
     $matchingPairs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

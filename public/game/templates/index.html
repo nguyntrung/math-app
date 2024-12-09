@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sudoku Solver</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+    
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        flex-direction: column; /* Căn giữa theo chiều dọc */
+      }
+
+      .container {
+        display: flex;
+        flex-direction: row; /* Các phần tử trong container sẽ được căn theo chiều ngang */
+        justify-content: center;
+        align-items: flex-start; /* Căn chỉnh các phần tử theo đầu của container */
+      }
+
+      table {
+        border: 2px solid black;
+        border-collapse: collapse;
+        margin-right: 40px; /* Để có khoảng cách giữa bảng Sudoku và bảng giải */
+      }
+
+      td {
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        border: 1px solid black;
+      }
+
+      input {
+        width: 40px;
+        height: 40px;
+        text-align: center;
+        font-size: 18px;
+      }
+
+      button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+      }
+
+      .solved-board {
+        margin-top: 20px;
+        border: 2px solid black;
+        border-collapse: collapse;
+      }
+
+      .solved-board td {
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        border: 1px solid black;
+        background-color: lightgray;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Bảng Sudoku -->
+      <div>
+        <table id="sudoku-board">
+          <!-- Bảng Sudoku sẽ được tạo ở đây -->
+          {% for row in board %}
+          <tr>
+            {% for num in row %}
+            <td>
+              <input
+                type="number"
+                value="{{ num if num != 0 else '' }}"
+                min="1"
+                max="9" />
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </table>
+        <button onclick="checkSolution()">Kiểm tra kết quả</button>
+      </div>
+
+      <!-- Bảng giải của hệ thống -->
+      <div id="solved-board-container" style="display: none">
+        <h3>Bài giải của hệ thống:</h3>
+        <table class="solved-board" id="solved-board">
+          <!-- Bài giải của máy sẽ được tạo ở đây -->
+        </table>
+      </div>
+    </div>
+
+    <script>
+      function checkSolution() {
+        const board = [];
+        const inputs = document.querySelectorAll("input");
+
+        for (let i = 0; i < 9; i++) {
+          const row = [];
+          for (let j = 0; j < 9; j++) {
+            const value = inputs[i * 9 + j].value;
+            row.push(value ? parseInt(value) : 0);
+          }
+          board.push(row);
+        }
+
+        fetch("/check_solution", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ board }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "checked") {
+              // Thay đổi màu sắc ô
+              let result = data.result;
+              const inputs = document.querySelectorAll("input");
+              for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                  const input = inputs[i * 9 + j];
+                  const resultCell = result[i][j];
+                  input.style.backgroundColor = resultCell.color; // Thay đổi màu
+                }
+              }
+
+              // Hiển thị bài giải của hệ thống
+              const solvedBoardContainer = document.getElementById(
+                "solved-board-container"
+              );
+              const solvedBoardTable = document.getElementById("solved-board");
+              solvedBoardContainer.style.display = "block";
+              solvedBoardTable.innerHTML = ""; // Clear any previous content
+
+              // Thêm bài giải vào bảng
+              const solvedBoard = data.solved_board;
+              solvedBoard.forEach((row) => {
+                const tr = document.createElement("tr");
+                row.forEach((num) => {
+                  const td = document.createElement("td");
+                  td.textContent = num !== 0 ? num : "";
+                  tr.appendChild(td);
+                });
+                solvedBoardTable.appendChild(tr);
+              });
+            }
+          })
+          .catch((error) => {
+            alert("Error checking solution: " + error.message);
+          });
+      }
+    </script>
+  </body>
+</html>
