@@ -28,7 +28,7 @@ if (isset($_GET['id'])) {
     $maBaiTap = $_GET['id'];
     
     // Lấy thông tin chương học từ cơ sở dữ liệu
-    $stmt = $conn->prepare("SELECT MaBaiTap, So1, So2, So3, So4, So5, KetQua, PhepToan, ThuTu FROM cauhoiontap WHERE MaBaiTap = ?");
+    $stmt = $conn->prepare("SELECT MaBaiTap, So1, So2, So3, So4, So5, KetQua, PhepToan, ThuTu FROM baitapvui WHERE MaBaiTap = ?");
     $stmt->execute([$maBaiTap]);
     $cauhoiOnTap = $stmt->fetch();
     
@@ -46,7 +46,7 @@ if (isset($_GET['id'])) {
     }
 } else {
     // Lấy thứ tự lớn nhất nếu không có mã bài tập để chỉnh sửa
-    $stmt = $conn->prepare("SELECT MAX(ThuTu) AS MaxThuTu FROM cauhoiontap");
+    $stmt = $conn->prepare("SELECT MAX(ThuTu) AS MaxThuTu FROM baitapvui");
     $stmt->execute();
     $result = $stmt->fetch();
     $thuTu = $result['MaxThuTu'] ? $result['MaxThuTu'] + 1 : 1; // Tăng lên 1 hoặc đặt thành 1 nếu không có
@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($maBaiTap) {
             // Cập nhật câu hỏi ôn tập
-            $stmt = $conn->prepare("UPDATE cauhoiontap SET So1 = ?, So2 = ?, So3 = ?, So4 = ?, So5 = ?, KetQua = ?, PhepToan = ?, ThuTu = ? WHERE MaBaiTap = ?");
+            $stmt = $conn->prepare("UPDATE baitapvui SET So1 = ?, So2 = ?, So3 = ?, So4 = ?, So5 = ?, KetQua = ?, PhepToan = ?, ThuTu = ? WHERE MaBaiTap = ?");
             if ($stmt->execute([$so1, $so2, $so3, $so4, $so5, $ketQua, $phepToan, $thuTu, $maBaiTap])) {
                 $successMessage = 'Cập nhật câu hỏi ôn tập thành công!';
             } else {
@@ -73,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         } else {
             // Thêm câu hỏi ôn tập mới
-            $stmt = $conn->prepare("INSERT INTO cauhoiontap (So1, So2, So3, So4, So5, KetQua, PhepToan, ThuTu) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO baitapvui (So1, So2, So3, So4, So5, KetQua, PhepToan, ThuTu) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             if ($stmt->execute([$so1, $so2, $so3, $so4, $so5, $ketQua, $phepToan, $thuTu])) {
                 $successMessage = 'Thêm câu hỏi ôn tập thành công!';
             } else {
@@ -91,7 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="utf-8" />
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-    <title>Quản lý câu hỏi ôn tập</title>
+    <title>Quản lý bài tập vui</title>
     <link rel="icon" type="image/x-icon" href="../assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -116,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="content-wrapper">
                     <div class="container-xxl flex-grow-1 container-p-y">
                         <div class="card">
-                            <h5 class="card-header"><?php echo $maBaiTap ? 'Chỉnh sửa câu hỏi' : 'Thêm câu hỏi'; ?></h5>
+                            <h5 class="card-header"><?php echo $maBaiTap ? 'Chỉnh sửa bài tập vui' : 'Thêm bài tập vui'; ?></h5>
                             <div class="card-body">
                                 <?php if ($errorMessage): ?>
                                 <div class="alert alert-danger"><?php echo $errorMessage; ?></div>

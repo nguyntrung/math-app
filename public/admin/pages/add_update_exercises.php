@@ -22,7 +22,7 @@ if (isset($_GET['id'])) {
     $maNoiCot = $_GET['id'];
     
     // Lấy thông tin nối cột từ cơ sở dữ liệu
-    $stmt = $conn->prepare("SELECT MaNoiCot, CauHoi, CauTraLoi FROM noicot WHERE MaNoiCot = ?");
+    $stmt = $conn->prepare("SELECT MaNoiCot, CauHoi, CauTraLoi FROM cauhoivui WHERE MaNoiCot = ?");
     $stmt->execute([$maNoiCot]);
     $noiCot = $stmt->fetch();
     
@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         if ($maNoiCot) {
             // Cập nhật bài tập
-            $stmt = $conn->prepare("UPDATE noicot SET CauHoi = ?, CauTraLoi = ? WHERE MaNoiCot = ?");
+            $stmt = $conn->prepare("UPDATE cauhoivui SET CauHoi = ?, CauTraLoi = ? WHERE MaNoiCot = ?");
             if ($stmt->execute([$cauHoi, $cauTraLoi, $maNoiCot])) {
                 $successMessage = 'Cập nhật bài tập thành công!';
             } else {
@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         } else {
             // Thêm bài tập mới
-            $stmt = $conn->prepare("INSERT INTO noicot (CauHoi, CauTraLoi) VALUES (?, ?)");
+            $stmt = $conn->prepare("INSERT INTO cauhoivui (CauHoi, CauTraLoi) VALUES (?, ?)");
             if ($stmt->execute([$cauHoi, $cauTraLoi])) {
                 $successMessage = 'Thêm bài tập thành công!';
             } else {
@@ -71,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="utf-8" />
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-    <title>Quản lý bài tập nối cột</title>
+    <title>Quản lý câu hỏi vui</title>
     <link rel="icon" type="image/x-icon" href="../assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -96,7 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="content-wrapper">
                     <div class="container-xxl flex-grow-1 container-p-y">
                         <div class="card">
-                            <h5 class="card-header"><?php echo $maNoiCot ? 'Chỉnh sửa bài tập' : 'Thêm bài tập'; ?></h5>
+                            <h5 class="card-header"><?php echo $maNoiCot ? 'Chỉnh sửa câu hỏi vui' : 'Thêm câu hỏi vui'; ?></h5>
                             <div class="card-body">
                                 <?php if ($errorMessage): ?>
                                 <div class="alert alert-danger"><?php echo $errorMessage; ?></div>

@@ -62,7 +62,7 @@ $cauhoiOnTapList = $stmt->fetchAll();
                     <!-- Content -->
                     <div class="container-xxl flex-grow-1 container-p-y">
                         <div class="card">
-                            <h5 class="card-header">Danh sách câu hỏi ôn tập</h5>
+                            <h5 class="card-header">Danh sách bài tập vui</h5>
                             <div class="card-body">
                                 <div class="table-responsive text-nowrap">
                                     <table class="table table-bordered">
