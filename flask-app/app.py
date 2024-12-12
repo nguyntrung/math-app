@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, request
 import random
 
 app = Flask(__name__)
@@ -44,22 +44,19 @@ def generate_sudoku():
         board[row][col] = 0
     return board
 
-@app.route('/')
-def index():
-    global solved_board
-    board = generate_sudoku()  # Tạo bảng Sudoku ngẫu nhiên
-    solved_board = [row[:] for row in board]  # Lưu bảng đã giải
-    solve(solved_board)  # Giải Sudoku
-    return render_template('index.html', board=board, solved_board=solved_board)
+@app.route('/generate_sudoku')
+def generate_sudoku_api():
+    board = generate_sudoku()
+    return jsonify(board)
 
 @app.route('/check_solution', methods=['POST'])
 def check_solution():
     data = request.get_json()
     user_board = data['board']
-    
+
     if not solved_board:
         return jsonify({'status': 'error', 'message': 'No solved board available.'})
-    
+
     result = []
     for i in range(9):
         row_result = []
@@ -69,7 +66,7 @@ def check_solution():
             else:
                 row_result.append({'value': user_board[i][j], 'color': 'red'})
         result.append(row_result)
-    
+
     return jsonify({'status': 'checked', 'result': result, 'solved_board': solved_board})
 
 if __name__ == '__main__':
