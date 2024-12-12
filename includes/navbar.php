@@ -52,9 +52,9 @@ if (isset($_SESSION['MaNguoiDung'])) {
                         <a href="../public/solutions.php" class="dropdown-item py-2 px-4 hover-scale">
                             <i class="fas fa-book mr-2"></i>Giải bài tập SGK</a>
                         <a href="../public/exercise.php" class="dropdown-item py-2 px-4 hover-scale">
-                            <i class="fas fa-redo mr-2"></i>Bài tập vui</a>
-                        <a href="../public/sudoku.php" class="dropdown-item py-2 px-4 hover-scale">
-                            <i class="fas fa-redo mr-2"></i>Trò chơi Sudoku</a>
+                            <i class="fa-solid fa-robot"></i> Bài tập vui</a>
+                        <a href="../public/game.php" class="dropdown-item py-2 px-4 hover-scale">
+                            <i class="fa-solid fa-gamepad"></i> Trò chơi Sudoku</a>
                     </div>
                 </div>
                 <a href="contact.php" class="nav-item nav-link rounded-pill px-4 mx-1 hover-scale">
