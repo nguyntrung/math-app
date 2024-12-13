@@ -13,124 +13,135 @@ include '../database/db.php';
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sudoku Solver</title>
+    <title>Trò Chơi Sudoku</title>
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
     <?php include '../includes/styles.php';?>
 
     <style>
-        body {
-        background-color: #f0f4f8;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        margin: 0;
-        }
+      body {
+          background-color: #f0f4f8;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          margin: 0;
+      }
 
-        .container {
-        margin: 20px auto;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: flex-start;
-        gap: 40px;
-        background-color: white;
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
+      .container {
+          margin: 20px auto;
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: flex-start;
+          gap: 40px;
+          background-color: white;
+          padding: 30px;
+          border-radius: 15px;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
 
-        #sudoku-board {
-        border: 4px solid #2c3e50;
-        border-collapse: separate;
-        border-spacing: 0;
-        border-radius: 10px;
-        overflow: hidden;
-        }
+      #sudoku-board {
+          border: 4px solid #2c3e50;
+          /* Đường viền tổng thể bảng */
+          border-collapse: separate;
+          /* Giữ cho các ô tách biệt */
+          border-spacing: 0;
+          /* Loại bỏ khoảng cách giữa các ô */
+      }
 
-        #sudoku-board tr:nth-child(3n) {
-        border-bottom: 3px solid #2c3e50;
-        }
+      #sudoku-board tr:nth-child(3) td {
+          border-bottom: 3px solid #2c3e50;
+          /* Đường viền dưới hàng thứ 3 */
+      }
 
-        #sudoku-board td {
-        width: 60px;
-        height: 60px;
-        text-align: center;
-        border: 1px solid #7f8c8d;
-        position: relative;
-        }
+      #sudoku-board tr:nth-child(6) td {
+          border-bottom: 3px solid #2c3e50;
+          /* Đường viền dưới hàng thứ 6 */
+      }
 
-        #sudoku-board td:nth-child(3n) {
-        border-right: 3px solid #2c3e50;
-        }
+      #sudoku-board td {
+          width: 60px;
+          height: 60px;
+          text-align: center;
+          border: 1px solid #7f8c8d;
+          /* Đường viền ô */
+          position: relative;
+      }
 
-        #sudoku-board input {
-        width: 100%;
-        height: 100%;
-        border: none;
-        text-align: center;
-        font-size: 24px;
-        font-weight: bold;
-        color: #2c3e50;
-        background-color: transparent;
-        outline: none;
-        transition: background-color 0.3s ease;
-        }
+      #sudoku-board td:nth-child(3),
+      #sudoku-board td:nth-child(6) {
+          border-right: 3px solid #2c3e50;
+          /* Đường viền dọc cho cột thứ 3 và thứ 6 */
+      }
 
-        #sudoku-board input:focus {
-        background-color: #e8f4f8;
-        }
+      #sudoku-board input {
+          width: 100%;
+          height: 100%;
+          border: none;
+          text-align: center;
+          font-size: 24px;
+          font-weight: bold;
+          color: #2c3e50;
+          background-color: transparent;
+          outline: none;
+          transition: background-color 0.3s ease;
+      }
 
-        button {
-        display: block;
-        width: 100%;
-        margin-top: 20px;
-        padding: 12px 20px;
-        font-size: 18px;
-        background-color: #3498db;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        }
+      #sudoku-board input:focus {
+          background-color: #e8f4f8;
+      }
 
-        button:hover {
-        background-color: #2980b9;
-        }
+      button {
+          display: block;
+          width: 100%;
+          margin-top: 20px;
+          padding: 12px 20px;
+          font-size: 18px;
+          background-color: #3498db;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+      }
 
-        .solved-board {
-        border: 4px solid #27ae60;
-        border-collapse: separate;
-        border-spacing: 0;
-        border-radius: 10px;
-        overflow: hidden;
-        }
+      button:hover {
+          background-color: #2980b9;
+      }
 
-        .solved-board td {
-        width: 60px;
-        height: 60px;
-        text-align: center;
-        border: 1px solid #7f8c8d;
-        background-color: #2ecc71;
-        color: white;
-        font-size: 24px;
-        font-weight: bold;
-        }
+      .solved-board {
+          border: 4px solid #27ae60;
+          border-collapse: separate;
+          border-spacing: 0;
+          border-radius: 10px;
+          overflow: hidden;
+      }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-                align-items: center;
-                gap: 20px;
-            }
+      .solved-board td {
+          width: 60px;
+          height: 60px;
+          text-align: center;
+          border: 1px solid #7f8c8d;
+          background-color: #2ecc71;
+          color: white;
+          font-size: 24px;
+          font-weight: bold;
+      }
 
-            #sudoku-board td, .solved-board td {
-                width: 40px;
-                height: 40px;
-                font-size: 18px;
-            }
-        }
+      /* Responsive Design */
+      @media (max-width: 768px) {
+          .container {
+              flex-direction: column;
+              align-items: center;
+              gap: 20px;
+          }
+
+          #sudoku-board td,
+          .solved-board td {
+              width: 40px;
+              height: 40px;
+              font-size: 18px;
+          }
+      }
     </style>
   </head>
   <body>
@@ -138,7 +149,7 @@ include '../database/db.php';
       <h2 class="text-center mt-4">SUDOKU</h2>
     <div class="container">
       <div>
-        <table id="sudoku-board">
+        <table id="sudoku-board" class="text-white">
           <?php 
           $ch = curl_init();
           curl_setopt($ch, CURLOPT_URL, "http://127.0.0.1:5000/generate_sudoku");
@@ -160,9 +171,9 @@ include '../database/db.php';
       </div>
 
       <div id="solved-board-container" style="display: none">
-        <h3>Bài giải của hệ thống:</h3>
         <table class="solved-board" id="solved-board">
         </table>
+        <h3 class="text-center mt-4">ĐÁP ÁN TRÒ CHƠI</h3>
       </div>
     </div>
     <?php include '../includes/footer.php'; ?>
@@ -172,6 +183,7 @@ include '../database/db.php';
         const board = [];
         const inputs = document.querySelectorAll("input");
 
+        // Xây dựng board từ input
         for (let i = 0; i < 9; i++) {
           const row = [];
           for (let j = 0; j < 9; j++) {
@@ -190,36 +202,41 @@ include '../database/db.php';
         })
         .then(response => response.json())
         .then(data => {
+          console.log(data);
+
           if (data.status === "checked") {
-            let result = data.result;
+            const result = data.result;
             const inputs = document.querySelectorAll("input");
+
             for (let i = 0; i < 9; i++) {
               for (let j = 0; j < 9; j++) {
                 const input = inputs[i * 9 + j];
                 const resultCell = result[i][j];
-                input.style.backgroundColor = resultCell.color;
+                input.style.backgroundColor = resultCell.color; 
               }
             }
 
             const solvedBoardContainer = document.getElementById("solved-board-container");
             const solvedBoardTable = document.getElementById("solved-board");
-            solvedBoardContainer.style.display = "block";
-            solvedBoardTable.innerHTML = "";
+            solvedBoardContainer.style.display = "block"; 
+            solvedBoardTable.innerHTML = ""; 
 
             const solvedBoard = data.solved_board;
             solvedBoard.forEach((row) => {
               const tr = document.createElement("tr");
               row.forEach((num) => {
                 const td = document.createElement("td");
-                td.textContent = num !== 0 ? num : "";
+                td.textContent = num !== 0 ? num : ""; 
                 tr.appendChild(td);
               });
               solvedBoardTable.appendChild(tr);
             });
+          } else {
+            alert("Không thể kiểm tra kết quả. Vui lòng thử lại.");
           }
         })
         .catch((error) => {
-          alert("Error checking solution: " + error.message);
+          alert("Lỗi khi kiểm tra kết quả: " + error.message);
         });
       }
     </script>
