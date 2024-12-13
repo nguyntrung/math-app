@@ -79,7 +79,7 @@ if ($showQuiz) {
     <?php include '../includes/styles.php'; ?>
     <style>
         .quiz-header {
-            background: linear-gradient(45deg, #7de381, #4CAF50);
+            background: linear-gradient(45deg,rgb(88, 195, 211), #17a2b8);
             border-radius: 15px;
             padding: 30px;
             margin-bottom: 30px;
@@ -103,11 +103,11 @@ if ($showQuiz) {
         }
 
         .card-header {
-            background: #4CAF50;
+            background: #17a2b8;
         }
 
         .btn-primary {
-            background: #4CAF50;
+            background: #17a2b8;
             max-width: 200px;
             margin: 0 auto;
             border-radius: 25px;

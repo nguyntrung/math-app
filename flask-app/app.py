@@ -1,9 +1,10 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 import random
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost", "http://localhost:5000"])
 
-# Lưu bảng Sudoku đã giải
 solved_board = None
 
 def is_valid(board, row, col, num):
@@ -33,15 +34,18 @@ def solve(board):
     return True
 
 def generate_sudoku():
+    global solved_board
     board = [[0 for _ in range(9)] for _ in range(9)]
-    for _ in range(80):
-        row, col = random.randint(0, 8), random.randint(0, 8)
-        num = random.randint(1, 9)
-        if is_valid(board, row, col, num):
-            board[row][col] = num
-    for _ in range(10):
+    
+    if solve(board):
+        solved_board = [row[:] for row in board] 
+    
+    difficulty = 50
+    
+    for _ in range(difficulty):
         row, col = random.randint(0, 8), random.randint(0, 8)
         board[row][col] = 0
+    
     return board
 
 @app.route('/generate_sudoku')
