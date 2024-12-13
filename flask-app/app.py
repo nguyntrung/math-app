@@ -34,12 +34,12 @@ def solve(board):
 
 def generate_sudoku():
     board = [[0 for _ in range(9)] for _ in range(9)]
-    for _ in range(40):
+    for _ in range(80):
         row, col = random.randint(0, 8), random.randint(0, 8)
         num = random.randint(1, 9)
         if is_valid(board, row, col, num):
             board[row][col] = num
-    for _ in range(20):
+    for _ in range(10):
         row, col = random.randint(0, 8), random.randint(0, 8)
         board[row][col] = 0
     return board
