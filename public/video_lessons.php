@@ -480,14 +480,14 @@ try {
                     <div class="progress-title fw-bold" id="chapterTitle"></div>
                     <div class="progress-stats">
                         <div class="progress-indicator">
-                            <span id="completedPoints">0</span>/<span id="totalPoints">0</span>
+                            <span id="completedPoints" style="display: none"></span><span id="totalPoints" style="display: none"></span>
                         </div>
                         <div class="d-flex justify-content-end">
-                            <div class="progress-legend">
+                            <!-- <div class="progress-legend">
                                 <span class="mr-3"><i class="fa-solid fa-circle-dot" style="color: #c6cfe1"></i> Chưa hoàn thành</span>
                                 <span class="mr-3"><i class="fa-solid fa-circle-dot" style="color: #03a9f4"></i> Đang hoàn thành</span>
                                 <span class="mr-3"><i class="fa-regular fa-circle-check" style="color: #3bab60"></i> Đã hoàn thành</span>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
